@@ -13,7 +13,7 @@
 
 
 //#define SYSTEM_DEBUG
-
+#define SERIAL_OUTPUT  1
 
 
 

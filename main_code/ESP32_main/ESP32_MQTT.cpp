@@ -181,7 +181,7 @@ void MQTT_subscribe() {
 //------------------------------------------
 void publishNow(Adafruit_MQTT_Publish topicPub,const char* MQTTmessage, bool retained, const char* failed, const char* sucess) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish(MQTTmessage,retained)) {Serial.println(F(failed));delay(PUB_WAIT);if (pub++>(PUB_RETRIES-1)) break;} 
+  while (!topicPub.publish((uint8_t *)MQTTmessage,retained)) {Serial.println(F(failed));delay(PUB_WAIT);if (pub++>(PUB_RETRIES-1)) break;} 
   if (pub<(PUB_RETRIES)) {Serial.println(F(sucess));}
 }//end publishNow
 //------------------------------------------

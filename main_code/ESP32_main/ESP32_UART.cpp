@@ -33,39 +33,39 @@ void UART_masterReady() {
   Serial.print(AUTHORIZED_KEY);
   bool not_authorized = true;
   uint32_t lastmillis = millis();
-  while (not_authorized) { //while not authorized yet
-    if ((millis()-lastmillis)>3000) { //only happend once every 3s
-        Serial.print('K');
-        Serial.print(AUTHORIZED_KEY);
-        lastmillis = millis();
-    }//end if
-    while (Serial.available()){
-      if (Serial.read()=='U') {
-        String buff = Serial.readString();
-        if (buff=="pdated!") {
-          not_authorized=false;
-        }//end if
-      }//end if
-    }//end while
-  }//end while
+//  while (not_authorized) { //while not authorized yet
+//    if ((millis()-lastmillis)>3000) { //only happend once every 3s
+//        Serial.print('K');
+//        Serial.print(AUTHORIZED_KEY);
+//        lastmillis = millis();
+//    }//end if
+//    while (Serial.available()){
+//      if (Serial.read()=='U') {
+//        String buff = Serial.readString();
+//        if (buff=="pdated!") {
+//          not_authorized=false;
+//        }//end if
+//      }//end if
+//    }//end while
+//  }//end while
   char Smes[60];
   snprintf(Smes,60,"S|%f|%f|%f|%d|%d|%d|%d|%d|%d",NVS_read_Kp(),NVS_read_Ki(),NVS_read_Kd(),NVS_read_F1(),NVS_read_F2(),NVS_read_T1(),NVS_read_T2(),NVS_read_T3(),NVS_read_T4());
   Serial.println(Smes);
   lastmillis = millis();
-  while (1) {
-    if ((millis()-lastmillis)>3000) { //only happend once every 3s
-        Serial.println(Smes); //resend if no confirmation was received
-        lastmillis = millis();
-    }//end if
-    while (Serial.available()){
-      if (Serial.read()=='U') {
-        String buff = Serial.readString();
-        if (buff=="pdated!") {
-          return;
-        }//end if
-      }//end if
-    }//end while
-  }//end while
+//  while (1) {
+//    if ((millis()-lastmillis)>3000) { //only happend once every 3s
+//        Serial.println(Smes); //resend if no confirmation was received
+//        lastmillis = millis();
+//    }//end if
+//    while (Serial.available()){
+//      if (Serial.read()=='U') {
+//        String buff = Serial.readString();
+//        if (buff=="pdated!") {
+//          return;
+//        }//end if
+//      }//end if
+//    }//end while
+//  }//end while
 }//end UART_masterReady
 //------------------------------------------------------------
  void UART_sendToSlave(int timeInterval) {//command: T|T1|T2|T3|T4_F|F1|F2
