@@ -24,13 +24,13 @@ typedef enum {
   STATE_RUN_1,
   STATE_RUN_2,
 
-  ERROR = 9999
+  STATE_ERROR = 9999
 } SystemState;
 // ------ Private function prototypes -------------------------
 
 // ------ Private variables -----------------------------------
 SystemState CurrentState;
-uint8_t stateChanged = false;
+uint8_t stateChanged = true;
 uint32_t lastMillis=0;
 // ------ PUBLIC variable definitions -------------------------
 SemaphoreHandle_t baton; //baton to make a core waiting for another core when needed
@@ -56,6 +56,7 @@ void System_init() {
 }//end System_init
 //------------------------------------------------------------
 void mainRoutine() {
+  char Smes[50];
  //################################# STATE CHECKING ##################################
   switch (CurrentState) {
    // ================================== STATE A ============================
@@ -63,7 +64,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Initial State");
+        snprintf(Smes,50,"Z|%d| Initial State",CurrentState);
+        S_PRINTLN(Smes);
 
       }
       pump1_OFF(); //PWM_1=0
@@ -84,7 +86,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Ready 01 State");
+        snprintf(Smes,50,"Z|%d| Ready 01 State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump1_OFF(); //PWM_1=0
       pump2_OFF(); //PWM_2=0
@@ -121,7 +124,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Ready 02 State");
+        snprintf(Smes,50,"Z|%d| Ready 02 State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump1_OFF(); //PWM_1=0
       pump2_OFF(); //PWM_2=0
@@ -155,7 +159,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Startup State");
+        snprintf(Smes,50,"Z|%d| Startup State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump1_maxspeed(); //PWM_1=1
       pump2_OFF(); //PWM_2=0
@@ -174,7 +179,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Startup Pump02 State");
+        snprintf(Smes,50,"Z|%d| Startup Pump 02 State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump1_maxspeed(); //PWM_1=1
       pump2_maxspeed(); //PWM_2=1
@@ -193,7 +199,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Transition State");
+        snprintf(Smes,50,"Z|%d| Transition State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump2_maxspeed(); //PWM_2=1
       relay01(OFF); //Valve=0
@@ -216,7 +223,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Run 01 State");
+        snprintf(Smes,50,"Z|%d| Run 01 State",CurrentState);
+        S_PRINTLN(Smes);
       }
       pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
@@ -254,7 +262,8 @@ void mainRoutine() {
       if (stateChanged)
       {
         stateChanged = false;
-        S_PRINTLN("Run 02 State");
+        snprintf(Smes,50,"Z|%d| Run 02 State",CurrentState);
+        S_PRINTLN(Smes);
       }
       relay01(ON); //Valve=1
       //-------------USE TEMP 1 TO CALCULATE THE PID----------------
@@ -291,12 +300,12 @@ void mainRoutine() {
 
       break;
     }//end CASE_D1
-   // ================================== ERROR ============================
-    case  ERROR: {
-      S_PRINTLN("System error!");
+   // ================================== STATE_ERROR============================
+    case STATE_ERROR: {
+      S_PRINTLN("System ERROR!");
       
       break;
-    }//end ERROR
+    }//end STATE_ERROR
   }//end switch
 //###################################################################################
 }//end mainRoutine

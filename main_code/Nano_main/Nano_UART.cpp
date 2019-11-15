@@ -136,33 +136,56 @@ void UART_isMasterReady() {
 		  } else {// no exist signal "t" and "f" at the same time
 			  D_PRINTLN(F("Not recognized command!"));
 		  }// end if else
-	  } else if (Ctemp=='P') { //if command is P|Kp|Ki|Kd
-		    uint16_t p1,p2,p3;
-		    float mpid[3]={0,0,0};
-		    String mKp="",mKi="",mKd="",rec="";
-        rec=Serial.readString();
-        p1 = rec.indexOf("|",0); //search for initial signal
-        if (p1==0) { //has the correct signal
-			    //set pid
-          p1=rec.indexOf("|",0);    //position of Kp
-          p2=rec.indexOf("|",p1+1); //position of Ki
-          p3=rec.indexOf("|",p2+1); //position of Kd
-			    mKp=rec.substring(p1+1,p2);//get the string out
-          mKi=rec.substring(p2+1,p3);//get the string out
-          mKd=rec.substring(p3+1);//get the string out
-          Serial.println("Fuck");
-          mpid[0] = mKp.toFloat(); //Kp
-          mpid[1] = mKi.toFloat(); //Ki
-          mpid[2] = mKd.toFloat(); //Kd
-			    changeSetVal(mpid);
-			    return;
-        } else {
-          D_PRINTLN(F("Not recognized command!"));
-        }// end if else
-	    } else {// not recognized command
-		    D_PRINTLN(F("Not recognized command!"));
-	    }// end if else
-    }//end if
+	  } 
+    else if (Ctemp=='P') { //if command is P|Kp|Ki|Kd
+      uint16_t p1,p2,p3;
+      float mpid[3]={0,0,0};
+      String mKp="",mKi="",mKd="",rec="";
+      rec=Serial.readString();
+      p1 = rec.indexOf("|",0); //search for initial signal
+      if (p1==0) { //has the correct signal
+        //set pid
+        p1=rec.indexOf("|",0);    //position of Kp
+        p2=rec.indexOf("|",p1+1); //position of Ki
+        p3=rec.indexOf("|",p2+1); //position of Kd
+        mKp=rec.substring(p1+1,p2);//get the string out
+        mKi=rec.substring(p2+1,p3);//get the string out
+        mKd=rec.substring(p3+1);//get the string out
+        Serial.println("Fuck");
+        mpid[0] = mKp.toFloat(); //Kp
+        mpid[1] = mKi.toFloat(); //Ki
+        mpid[2] = mKd.toFloat(); //Kd
+        changeSetVal(mpid);
+        return;
+      } 
+      else {
+        D_PRINTLN(F("Not recognized command!"));
+      }// end if else
+    }
+    else if (Ctemp=='Z') // State command
+    {
+      uint16_t pos1, pos2;
+      uint16_t state_value;
+      String state_string ="";
+      String record = "";
+      record = Serial.readString();
+      pos1 = record.indexOf("|",0);
+      if (pos1 == 0) //has the correct state format
+      {
+        pos2 = record.indexOf("|",pos1+1);
+        state_string = record.substring(pos1+1,pos2);
+        state_value = state_string.toInt();
+        LCD_changeState(state_value);
+      }
+      else
+      {
+        D_PRINTLN(F("Unrecognized command!"));        
+      }
+    } 
+    else {// not recognized command
+      D_PRINTLN(F("Not recognized command!"));
+    }// end if else
+  }//end if
 }// end getFromMaster
 //--------------------------------
 void PIDsendToMaster(float* Mpid) { //p|Kp|Ki|Kd

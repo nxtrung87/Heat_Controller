@@ -37,6 +37,11 @@ void changeSetVal(float*,uint16_t*,uint16_t*);
 Change Set Value: PID parameters to display on the LCD
 */
 void changeSetVal(float*);
+
+/**
+Change system state to display on the LCD
+*/
+void LCD_changeState(uint16_t state);
 // ------ Public variable -------------------------------------
 
 #endif //_NANO_LCD_H

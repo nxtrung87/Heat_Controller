@@ -10,6 +10,7 @@
 #ifndef  __NANO_LCD_CPP 
 #define  __NANO_LCD_CPP
 #include "Nano_LCD.h"
+#include <string.h>
 
 // ------ Private constants -----------------------------------
 #define LCD_ADRESS 	0x27
@@ -27,11 +28,25 @@ typedef enum {
 typedef enum {
 	MAIN_STATE,
 	PID_STATE,
+  SHOW_STATE,
 	TEMP_STATE,
 	FLOW_STATE,
   SET_TEMP,
   SET_FLOW,
 } LCDstate;
+
+typedef enum {
+  STATE_INIT,
+  STATE_READY_1,
+  STATE_READY_2,
+  STATE_STARTUP,
+  STATE_STARTUP_PUMP2,
+  STATE_TRANSITION,
+  STATE_RUN_1,
+  STATE_RUN_2,
+
+  STATE_ERROR = 9999
+} SystemState;
 
 #define CONFIRM_MAX 350
 #define CONFIRM_MIN 170
@@ -72,6 +87,11 @@ void LCD_temp();
 User interface for the water flow monitoring
 */
 void LCD_flow();
+
+/**
+User interface for showing the current state
+*/
+void LCD_showState();
 // ------ Private variables -----------------------------------
 int currentState=MAIN_STATE;
 bool PIDchange=false;
@@ -81,6 +101,7 @@ uint16_t sTemp[4]={0,0,0,0};// an array that saves the user-set temperature T1 t
 uint16_t flow[2]={0,0};// an array that saves flow sensor values correspondingly
 uint16_t sFlow[2]={0,0};// an array that saves the user-set flow values correspondingly
 float PID[3]={0,0,0};// an array that saves kp,ki,kd correspondingly
+uint16_t programState = 0; // Store state flow state value
 // ------ PUBLIC variable definitions -------------------------
 LiquidCrystal_I2C lcd(LCD_ADRESS, LCD_WIDTH, LCD_HEIGHT);
 //--------------------------------------------------------------
@@ -104,6 +125,7 @@ void LCD_display() {
 	  case FLOW_STATE: 	{LCD_flow();break;}
     case SET_TEMP:    {TempEditor(); break;}
     case SET_FLOW:    {FlowEditor(); break;}
+    case SHOW_STATE:    {LCD_showState(); break;}
 	  case ERROR: 		  {break;}
 	}//end switch
 }//end LCD_display
@@ -135,12 +157,65 @@ int buttonRead()
 	return ERROR; //error
 }//end buttonRead
 //--------------------------------
+void LCD_showState()
+{
+  String state_LCD;
+  switch (programState)
+  {
+    case STATE_INIT:
+      state_LCD = "INIT      ";
+      break;
+    case STATE_READY_1:
+      state_LCD = "READY 01  ";
+      break;
+    case STATE_READY_2:
+      state_LCD = "READY 02  ";
+      break;
+    case STATE_RUN_1:
+      state_LCD = "RUN 01    ";
+      break;    
+    case STATE_RUN_2:
+      state_LCD = "RUN 02    ";
+      break;    
+    case STATE_STARTUP:
+      state_LCD = "STARTUP   ";
+      break;  
+    case STATE_STARTUP_PUMP2:
+      state_LCD = "SU PUMP 02";
+      break;  
+    case STATE_TRANSITION:
+      state_LCD = "TRANSITION";
+      break;      
+    case STATE_ERROR:
+      state_LCD = "ERROR     ";
+      break;      
+  }
+
+lcd.setCursor(1,0); lcd.print(state_LCD);
+
+switch (buttonRead()) 
+{
+case BUT_UP: 
+case BUT_DOWN: 
+case BUT_RIGHT:
+case BUT_LEFT:
+  break;
+case BUT_CONFIRM: 
+{
+  currentState=MAIN_STATE;LCDpointer=1;lcd.clear();return;
+}
+case ERROR:     {break;}
+}//end switch
+return;
+}
+
 void LCD_menu()
 {
  //------------------------------Display user interface------------------
 	lcd.setCursor(1,0); lcd.print("PID ");
 //  lcd.setCursor(1,1); lcd.print(analogRead(BUTTON_PIN));lcd.print("    ");  //<-- this line used for determine the ADC value when power suppy changes
 //Serial.println(analogRead(BUTTON_PIN));
+  lcd.setCursor(1,1); lcd.print("STATE");
 	lcd.setCursor(6,0); lcd.print("TEMP");
 	lcd.setCursor(6,1); lcd.print("FLOW");
   lcd.setCursor(11,0);lcd.print("sTEMP");
@@ -148,30 +223,42 @@ void LCD_menu()
   
 	if (LCDpointer==1) {
 		lcd.setCursor(0,0);   lcd.print(">");
+    lcd.setCursor(0,1);   lcd.print(" ");
 		lcd.setCursor(5,0);   lcd.print(" ");
     lcd.setCursor(5,1);   lcd.print(" ");
 		lcd.setCursor(10,0);  lcd.print(" ");
     lcd.setCursor(10,1);  lcd.print(" ");
-	} else if(LCDpointer==2) {
+  } else if(LCDpointer==2) {
     lcd.setCursor(0,0);   lcd.print(" ");
-    lcd.setCursor(5,0);   lcd.print(">");
+    lcd.setCursor(0,1);   lcd.print(">");
+    lcd.setCursor(5,0);   lcd.print(" ");
     lcd.setCursor(5,1);   lcd.print(" ");
     lcd.setCursor(10,0);  lcd.print(" ");
     lcd.setCursor(10,1);  lcd.print(" ");
 	} else if(LCDpointer==3) {
     lcd.setCursor(0,0);   lcd.print(" ");
+    lcd.setCursor(0,1);   lcd.print(" ");
+    lcd.setCursor(5,0);   lcd.print(">");
+    lcd.setCursor(5,1);   lcd.print(" ");
+    lcd.setCursor(10,0);  lcd.print(" ");
+    lcd.setCursor(10,1);  lcd.print(" ");
+	} else if(LCDpointer==4) {
+    lcd.setCursor(0,0);   lcd.print(" ");
+    lcd.setCursor(0,1);   lcd.print(" ");
     lcd.setCursor(5,0);   lcd.print(" ");
     lcd.setCursor(5,1);   lcd.print(">");
     lcd.setCursor(10,0);  lcd.print(" ");
     lcd.setCursor(10,1);  lcd.print(" ");
-	} else if(LCDpointer==4)  {
+	} else if(LCDpointer==5)  {
     lcd.setCursor(0,0);   lcd.print(" ");
+    lcd.setCursor(0,1);   lcd.print(" ");
     lcd.setCursor(5,0);   lcd.print(" ");
     lcd.setCursor(5,1);   lcd.print(" ");
     lcd.setCursor(10,0);  lcd.print(">");
     lcd.setCursor(10,1);  lcd.print(" ");
-  } else if(LCDpointer==5)  {
+  } else if(LCDpointer==6)  {
     lcd.setCursor(0,0);   lcd.print(" ");
+    lcd.setCursor(0,1);   lcd.print(" ");
     lcd.setCursor(5,0);   lcd.print(" ");
     lcd.setCursor(5,1);   lcd.print(" ");
     lcd.setCursor(10,0);  lcd.print(" ");
@@ -182,13 +269,13 @@ void LCD_menu()
 	switch (buttonRead()) {
 	  case BUT_UP: 
 	  {
-      if(LCDpointer<2)  LCDpointer=5;
+      if(LCDpointer<2)  LCDpointer=6;
       else              LCDpointer--;
 		  break;
 	  }
 	  case BUT_DOWN: 
 	  {
-      if(LCDpointer>4)  LCDpointer=1;
+      if(LCDpointer>5)  LCDpointer=1;
       else              LCDpointer++;
 		  break;
 	  }
@@ -198,10 +285,11 @@ void LCD_menu()
 	  {
 		  switch (LCDpointer) {
 		    case 1: {currentState=PID_STATE;LCDpointer=1;lcd.clear();return;}
-		    case 2:	{currentState=TEMP_STATE;LCDpointer=1;lcd.clear();return;}
-		    case 3:	{currentState=FLOW_STATE;LCDpointer=1;lcd.clear();return;}
-        case 4: {currentState=SET_TEMP; LCDpointer=1;lcd.clear();return;}
-        case 5: {currentState=SET_FLOW; LCDpointer=1;lcd.clear();return;}
+        case 2:	{currentState=SHOW_STATE;LCDpointer=1;lcd.clear();return;}
+		    case 3:	{currentState=TEMP_STATE;LCDpointer=1;lcd.clear();return;}
+		    case 4:	{currentState=FLOW_STATE;LCDpointer=1;lcd.clear();return;}
+        case 5: {currentState=SET_TEMP; LCDpointer=1;lcd.clear();return;}
+        case 6: {currentState=SET_FLOW; LCDpointer=1;lcd.clear();return;}
 		  }//end switch case
 	  }
 	  case ERROR:     {break;}
@@ -370,7 +458,7 @@ void FlowEditor()
    lcd.setCursor(0,0); lcd.print(" ");
    lcd.setCursor(0,1); lcd.print(">");
   }//end if else
-  if (LCDpointer>2) LCDpointer==1;
+  if (LCDpointer>2) LCDpointer=1;
   
   switch ( buttonRead())
   {
@@ -508,4 +596,9 @@ void changeSetVal(float* vPID) {
   *(PID+2) = *(vPID+2); //Kd
 }//end changeSetVal
 //----------------------------
+
+void LCD_changeState(uint16_t state)
+{
+  programState = state;
+}
 #endif //__NANO_LCD_CPP
