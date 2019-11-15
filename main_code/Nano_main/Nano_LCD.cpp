@@ -215,7 +215,7 @@ void LCD_menu()
 	lcd.setCursor(1,0); lcd.print("PID ");
 //  lcd.setCursor(1,1); lcd.print(analogRead(BUTTON_PIN));lcd.print("    ");  //<-- this line used for determine the ADC value when power suppy changes
 //Serial.println(analogRead(BUTTON_PIN));
-  lcd.setCursor(1,1); lcd.print("STATE");
+  lcd.setCursor(1,1); lcd.print("STAT");
 	lcd.setCursor(6,0); lcd.print("TEMP");
 	lcd.setCursor(6,1); lcd.print("FLOW");
   lcd.setCursor(11,0);lcd.print("sTEMP");
