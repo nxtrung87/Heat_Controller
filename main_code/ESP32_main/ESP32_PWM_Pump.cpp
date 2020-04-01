@@ -142,5 +142,12 @@ void pump1_OFF() {
 void pump2_OFF() {
   ledcWrite(PWM_CHANNEL_2,OFF_MODE);
 }//end pump1_OFF
+
+void Pump_output(float valPump) { //valPump goes from 0.01 to 1 (1% to 100%)
+ 
+   pump1_output = (valPump)*PWM_RESOLUTION; //plus 1% of duty cycle each time this function is called if maximum value is not exceeded.
+   ledcWrite(PWM_CHANNEL_1, pump1_output); //output signal to the pump
+}//end pump2_faster
+
 //------------------------
 #endif //__ESP32_PWM_PUMP_CPP

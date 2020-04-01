@@ -19,13 +19,13 @@
 //--------------------------------------------------------------
 // FLOW MAPPING
 //--------------------------------------------------------------
-#define FLOW_MIN 0    //put the mininum value of your flow sensor here
-#define FLOW_MAX 100  //put the maximum value of your flow sensor here
+#define FLOW_MIN 20    //put the mininum value of your flow sensor here
+#define FLOW_MAX 250  //put the maximum value of your flow sensor here
 //--------------------------------------------------------------
 // TEMPERATURE MAPPING
 //--------------------------------------------------------------
 #define TEMP_MIN 0    //put the mininum value of your temperature sensor here
-#define TEMP_MAX 850  //put the maximum value of your temperature sensor here
+#define TEMP_MAX 250  //put the maximum value of your temperature sensor here
 //--------------------------------------------------------------
 // ADC
 //--------------------------------------------------------------

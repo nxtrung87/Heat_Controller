@@ -160,6 +160,8 @@ void pump1_OFF();
 Turn OFF Pump2
 **/
 void pump2_OFF();
+
+void Pump_output(float);
 // ------ Public variable -------------------------------------
 
 #endif //__ESP32_PWM_PUMP_H

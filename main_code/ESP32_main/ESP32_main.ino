@@ -11,7 +11,7 @@
 
 
 
-int UPDATE_INTERVAL = 10; //time interval to update data to the server
+int UPDATE_INTERVAL = 1; //time interval to update data to the server
 
 
 
