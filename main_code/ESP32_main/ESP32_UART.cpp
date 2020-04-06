@@ -10,6 +10,7 @@
 #ifndef  __ESP32_UART_CPP
 #define  __ESP32_UART_CPP
 #include "ESP32_UART.h"
+#include "ESP32_FlowSensor.h"
 
 // ------ Private constants -----------------------------------
 
@@ -49,7 +50,7 @@ void UART_masterReady() {
 //    }//end while
 //  }//end while
   char Smes[60];
-  snprintf(Smes,60,"S|%f|%f|%f|%d|%d|%d|%d|%d|%d",NVS_read_Kp(),NVS_read_Ki(),NVS_read_Kd(),NVS_read_F1(),NVS_read_F2(),NVS_read_T1(),NVS_read_T2(),NVS_read_T3(),NVS_read_T4());
+  snprintf(Smes,60,"S|%f|%f|%f|%f|%f|%d|%d|%d|%d",NVS_read_Kp(),NVS_read_Ki(),NVS_read_Kd(),NVS_read_F1(),NVS_read_F2(),NVS_read_T1(),NVS_read_T2(),NVS_read_T3(),NVS_read_T4());
   Serial.println(Smes);
   lastmillis = millis();
 //  while (1) {
@@ -72,7 +73,7 @@ void UART_masterReady() {
   if ((millis()-uartLastMillis)>timeInterval*1000) {
     uartLastMillis = millis();
     char Smes[60];
-    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%d|%d",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),flowSen01_read(),flowSen02_read());
+    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%f|%f",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),FlowSensor_get_flow(),(float)flowSen02_read());
     Serial.println(Smes);
   }//end if
 }// end UART_sendToSlave
@@ -139,7 +140,7 @@ void UART_getFromSlave() {// P|Kp|Ki|Kd or T|T1|T2|T3|T4 or F|F1|F2
         f2=rec.indexOf("|",f1+1); //position of flow2
         bF1=rec.substring(f1+1,f2);//get the string out
         bF2=rec.substring(f2+1);//get the string out
-        NVS_Flow_write(bF1.toInt(),bF2.toInt());
+        NVS_Flow_write(bF1.toFloat(),bF2.toFloat());
         D_PRINTLN(F("flow saved!"));
       } else {
          D_PRINTLN(F("Not recognized command!"));

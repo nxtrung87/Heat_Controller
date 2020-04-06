@@ -56,15 +56,15 @@ int NVS_read_T4();
 /**
 Write the set flow values to the NVS
 **/
-void NVS_Flow_write(int,int);
+void NVS_Flow_write(float, float);
 /**
 Read the set Flow
 **/
-int NVS_read_F1();
+float NVS_read_F1();
 /**
 Read the set Flow
 **/
-int NVS_read_F2();
+float NVS_read_F2();
 // ------ Public variable -------------------------------------
 
 #endif //_ESP32_NVS_H

@@ -154,21 +154,21 @@ int NVS_read_T4() {
     return 0;
 }//end NVS_read_T4
 //------------------------------------------
-void NVS_Flow_write(int F1,int F2) {
+void NVS_Flow_write(float F1,float F2) {
     Preferences preferences; /* create an instance of Preferences library */
     preferences.begin("Flow", false);/* Start a namespace "WifiInfo",in Read-Write mode: set second parameter to false. Note: Namespace name is limited to 15 chars */
     preferences.putBool("validFlow", true);
-    preferences.putInt("F1", F1);
-    preferences.putInt("F2", F2);
+    preferences.putFloat("F1", F1);
+    preferences.putFloat("F2", F2);
     preferences.end();
 }//end NVS_system_write
 //------------------------------------------
-int NVS_read_F1() {
+float NVS_read_F1() {
     Preferences preferences; /* create an instance of Preferences library */
     preferences.begin("Flow", true);/* Start a namespace "WifiInfo",in Read-Write mode: set second parameter to false. Note: Namespace name is limited to 15 chars */
     bool hasState = preferences.getBool("validFlow", false);
     if (hasState) {
-      int currentF = preferences.getInt("F1",0);
+      int currentF = preferences.getFloat("F1",0);
       preferences.end();
       return currentF;
     } else {
@@ -178,12 +178,12 @@ int NVS_read_F1() {
     return 0;
 }//end NVS_read_F1
 //------------------------------------------
-int NVS_read_F2() {
+float NVS_read_F2() {
     Preferences preferences; /* create an instance of Preferences library */
     preferences.begin("Flow", true);/* Start a namespace "WifiInfo",in Read-Write mode: set second parameter to false. Note: Namespace name is limited to 15 chars */
     bool hasState = preferences.getBool("validFlow", false);
     if (hasState) {
-      int currentF = preferences.getInt("F2",0);
+      int currentF = preferences.getFloat("F2",0);
       preferences.end();
       return currentF;
     } else {

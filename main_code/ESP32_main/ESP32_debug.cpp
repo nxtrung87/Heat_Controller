@@ -32,42 +32,29 @@ void debug_init() {
   pump1_init();
   pump2_init();
   relay_init();
+  FlowSensor_init();
   UART_masterReady();
   core0_init(); //must stand above MQTT init
   
   xSemaphoreTake(baton, portMAX_DELAY); // ( TickType_t ) and portTICK_PERIOD_MS is also available , view: http://esp32.info/docs/esp_idf/html/d1/d19/group__xSemaphoreTake.html 
   xSemaphoreGive(baton);
+  
+  FlowSensor_start();
 }//end debug_init
 //------------------------------------------------------------
 void system_debug() {
-//  CONTROL RELAY LIKE THIS
-//   relay01(ON);
-//   relay02(OFF);
-//   relay03(OFF);
-    
 
-//  READ VALUE FROM THE MEMORY LIKE THIS
-//   Serial.println(NVS_read_Kp());
-//   Serial.println(NVS_read_Ki());
-//   Serial.println(NVS_read_Kd());
-//   Serial.println(NVS_read_T1());
-//   Serial.println(NVS_read_T2());
-//   Serial.println(NVS_read_T3());
-//   Serial.println(NVS_read_T4());
-//   Serial.println(NVS_read_F1());
-//   Serial.println(NVS_read_F2());
-//   delay(5000);
 //  PUBLISH THE TEMPERATURE LIKE THIS
-//   MQTT_T1_pub(31);//tempSen01_read()
-//   MQTT_T2_pub(35);//tempSen02_read()
-//   MQTT_T3_pub(33);//tempSen03_read()
-//   MQTT_T4_pub(30);//tempSen04_read()
-//   you can put any value as you want like this
-//   MQTT_T1_pub(123); 
+  MQTT_T1_pub(tempSen01_read());
+  MQTT_T2_pub(tempSen02_read());
+  MQTT_T3_pub(tempSen03_read());
+  MQTT_T4_pub(tempSen04_read());
 
 //  PUBLISH THE PUMP PWM FREQ LIKE THIS
-//   MQTT_Pump1pwm_pub(pump1pwm_read());
-//   MQTT_Pump2pwm_pub(pump2pwm_read());
+  MQTT_Pump1pwm_pub(pump1pwm_read());
+  MQTT_FlowSen_01_pub(FlowSensor_get_flow());
+  // MQTT_Pump2pwm_pub(pump2pwm_read());
+
 
 }//end system_debug
 

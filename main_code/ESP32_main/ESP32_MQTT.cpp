@@ -42,6 +42,7 @@ Adafruit_MQTT_Publish pub_pump2pwm = Adafruit_MQTT_Publish(&mqtt,PUMP2PWM_FEED,M
 Adafruit_MQTT_Publish pub_relay01 = Adafruit_MQTT_Publish(&mqtt,RELAY01_FEED,MQTT_QOS_0);
 Adafruit_MQTT_Publish pub_relay02 = Adafruit_MQTT_Publish(&mqtt,RELAY02_FEED,MQTT_QOS_0);
 Adafruit_MQTT_Publish pub_relay03 = Adafruit_MQTT_Publish(&mqtt,RELAY03_FEED,MQTT_QOS_0);
+Adafruit_MQTT_Publish pub_flowsen01 = Adafruit_MQTT_Publish(&mqtt,FLOWSENS_01_FEED,MQTT_QOS_0);
 //SUBCRIBE
 Adafruit_MQTT_Subscribe sub_kp = Adafruit_MQTT_Subscribe(&mqtt,KP_FEED,MQTT_QOS_1);
 Adafruit_MQTT_Subscribe sub_ki = Adafruit_MQTT_Subscribe(&mqtt,KI_FEED,MQTT_QOS_1);
@@ -232,6 +233,10 @@ void MQTT_Pump1pwm_pub(float pwmVal) {
 void MQTT_Pump2pwm_pub(float pwmVal) {
   publishNow(pub_pump2pwm,(int)(pwmVal*100),RETAIN,"Pump2 pwm Failed!","Pump2 pwm updated!");
 }//end MQTT_Pump2pwm_pub
+//------------------------------------------
+void MQTT_FlowSen_01_pub(float flowSenVal) {
+  publishNow(pub_flowsen01,flowSenVal,RETAIN,"Flow Sensor 01 Failed!","Flow Sensor 01 updated!");
+}//end MQTT_FlowSen_01_pub
 //------------------------------------------
 void MQTT_relay01_pub(bool Rstate) {
   publishNow(pub_relay01,(Rstate==ON)?("ON"):("OFF"),RETAIN,"Relay01 Failed!","Relay01 updated!");

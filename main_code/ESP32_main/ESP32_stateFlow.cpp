@@ -11,6 +11,7 @@
 #ifndef  __ESP32_STATEFLOW_CPP
 #define  __ESP32_STATEFLOW_CPP
 #include "ESP32_stateFlow.h"
+#include "ESP32_FlowSensor.h"
 
 // ------ Private constants -----------------------------------
 #define STARTUP_STATE STATE_INIT
@@ -45,14 +46,17 @@ void System_init() {
   ADC_init();
   PID_init();
   pump1_init();
-  pump2_init();
+  // pump2_init();
   relay_init();
+  FlowSensor_init();
   UART_masterReady();
   core0_init(); //must stand above MQTT init
 
   
   xSemaphoreTake(baton, portMAX_DELAY); // ( TickType_t ) and portTICK_PERIOD_MS is also available , view: http://esp32.info/docs/esp_idf/html/d1/d19/group__xSemaphoreTake.html 
   xSemaphoreGive(baton);
+
+  FlowSensor_start();
 }//end System_init
 //------------------------------------------------------------
 void mainRoutine() {
@@ -69,7 +73,7 @@ void mainRoutine() {
 
       }
       pump1_OFF(); //PWM_1=0
-      pump2_OFF(); //PWM_2=0
+      // pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
 
       if (tempSen01_read()>60) { // T_collector >60
@@ -90,7 +94,7 @@ void mainRoutine() {
         S_PRINTLN(Smes);
       }
       pump1_OFF(); //PWM_1=0
-      pump2_OFF(); //PWM_2=0
+      // pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
       
       if ((tempSen02_read()<80)&& //T_Buffer1 < 80
@@ -128,7 +132,7 @@ void mainRoutine() {
         S_PRINTLN(Smes);
       }
       pump1_OFF(); //PWM_1=0
-      pump2_OFF(); //PWM_2=0
+      // pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
 
       if (tempSen01_read()<50) { // T_collector <50
@@ -163,7 +167,7 @@ void mainRoutine() {
         S_PRINTLN(Smes);
       }
       pump1_maxspeed(); //PWM_1=1
-      pump2_OFF(); //PWM_2=0
+      // pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
       
       if ((millis()-lastMillis)>30000) { // after 30s 
@@ -183,7 +187,7 @@ void mainRoutine() {
         S_PRINTLN(Smes);
       }
       pump1_maxspeed(); //PWM_1=1
-      pump2_maxspeed(); //PWM_2=1
+      // pump2_maxspeed(); //PWM_2=1
       relay01(ON); //Valve=1
       
       if ((millis()-lastMillis)>30000) { // after 30s
@@ -202,7 +206,7 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Transition State",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump2_maxspeed(); //PWM_2=1
+      // pump2_maxspeed(); //PWM_2=1
       relay01(OFF); //Valve=0
       //-------------USE TEMP 1 TO CALCULATE THE PID----------------
       float temp = PIDcal(NVS_read_T1(),tempSen01_read());
@@ -226,7 +230,7 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Run 01 State",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump2_OFF(); //PWM_2=0
+      // pump2_OFF(); //PWM_2=0
       relay01(OFF); //Valve=0
       //-------------USE TEMP 1 TO CALCULATE THE PID----------------
       float temp = PIDcal(NVS_read_T1(),tempSen01_read());
@@ -272,10 +276,10 @@ void mainRoutine() {
       if (temp1<0) {pump1_slower(-temp1);} //PWM_1 = PWM1_in
       else         {pump1_faster(temp1);} //PWM_1 = PWM1_in
       //-------------USE TEMP 1 TO CALCULATE THE PID----------------
-      float temp2 = PIDcal(NVS_read_T1(),tempSen01_read());
+      // float temp2 = PIDcal(NVS_read_T1(),tempSen01_read());
       //-------------------------------------------------
-      if (temp2<0) {pump2_slower(-temp2);} //PWM_2 = PWM2_in
-      else         {pump2_faster(temp2);} //PWM_2 = PWM2_in
+      // if (temp2<0) {pump2_slower(-temp2);} //PWM_2 = PWM2_in
+      // else         {pump2_faster(temp2);} //PWM_2 = PWM2_in
       
       if (tempSen04_read()<21) { // T_h <21
         CurrentState = STATE_RUN_1; // STATE_D

@@ -14,7 +14,7 @@
 #include "debugConfig.h"
 //#include "config.h"
 
-#define SERIAL_OUTPUT
+// #define SERIAL_OUTPUT
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////MODE CONFIGS/////////////////////////////////////////////////////////////////////
 //--------------------------------------------------------------
@@ -61,7 +61,7 @@
   
 #endif
 //========================= YONOS PARA ST 15/13 PWM2 =============
-#ifdef YONOS_PARA_ST_15/13_PWM2
+#ifdef YONOS_PARA_ST_15_13_PWM2
   #define PWM_FREQ  1000  //Signal frequency: 100 Hz-5000 Hz (1000 Hz nominal).
   #define MAX_SPEED           0.97*PWM_RESOLUTION   // >95% --> choose 97%
   #define MIN_SPEED           0.13*PWM_RESOLUTION   // >7% and <15% pump runs at minimum speed (operation) and from 12% to 15% pump runs at minimum speed (start up) --> choose 13%

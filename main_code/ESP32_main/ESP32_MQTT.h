@@ -53,6 +53,7 @@
 #define RELAY01_FEED    "heatcontroller2019/feeds/relay01"   //command feed, chang it to yours
 #define RELAY02_FEED    "heatcontroller2019/feeds/relay02"   //command feed, chang it to yours
 #define RELAY03_FEED    "heatcontroller2019/feeds/relay03"   //command feed, chang it to yours
+#define FLOWSENS_01_FEED   "heatcontroller2019/feeds/flowsen-01"
 
 #define PING_WAIT   55000
 #define PING_TIMES  10
@@ -106,6 +107,10 @@ void MQTT_Pump1pwm_pub(float);
 Publish the pwm freq of Pump2 to the server
 **/
 void MQTT_Pump2pwm_pub(float);
+/**
+Publish the value of flow sensor 01 to the server
+**/
+void MQTT_FlowSen_01_pub(float flowSenVal);
 /**
 publish the wanted value to the broker (self-created QOS1)-- make sure the packet made it to the broker
 **/

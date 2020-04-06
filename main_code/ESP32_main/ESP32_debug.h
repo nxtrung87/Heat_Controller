@@ -18,6 +18,7 @@
 #include "ESP32_MQTT.h"
 #include "ESP32_NVS.h"
 #include "ESP32_FET.h"
+#include "ESP32_FlowSensor.h"
 #include "ESP32_core0.h"
 
 // ------ Public constants ------------------------------------

@@ -17,9 +17,10 @@ int UPDATE_INTERVAL = 1; //time interval to update data to the server
 
 
 #ifdef SYSTEM_DEBUG
-  #include "ESP32_debug.h"
+  
 #else
-  #include "ESP32_stateFlow.h"
+#include "ESP32_debug.h"
+#include "ESP32_stateFlow.h"
 #endif
 
 
@@ -40,8 +41,8 @@ void loop() {
   UART_sendToSlave(UPDATE_INTERVAL); //send data to slave every 10 second - you can change the interval as you want
 
   #ifdef SYSTEM_DEBUG
-    system_debug();
   #else
+    system_debug();
     mainRoutine();
   #endif
   
