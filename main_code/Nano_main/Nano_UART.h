@@ -41,7 +41,7 @@ void sTempSendToMaster(uint16_t*);
 /**
 Send flow data to master
 **/
-void sFlowSendToMaster(uint16_t*);
+void sFlowSendToMaster(float*);
 // ------ Public variable -------------------------------------
 
 #endif // __NANO_UART_H

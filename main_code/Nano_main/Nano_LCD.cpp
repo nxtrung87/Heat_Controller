@@ -98,8 +98,8 @@ bool PIDchange=false;
 int LCDpointer=1;
 uint16_t Temp[4]={0,0,0,0};// an array that saves temperature T1 to T4 correspondingly
 uint16_t sTemp[4]={0,0,0,0};// an array that saves the user-set temperature T1 to T4 correspondingly
-uint16_t flow[2]={0,0};// an array that saves flow sensor values correspondingly
-uint16_t sFlow[2]={0,0};// an array that saves the user-set flow values correspondingly
+float flow[2]={0,0};// an array that saves flow sensor values correspondingly
+float sFlow[2]={0,0};// an array that saves the user-set flow values correspondingly
 float PID[3]={0,0,0};// an array that saves kp,ki,kd correspondingly
 uint16_t programState = 0; // Store state flow state value
 // ------ PUBLIC variable definitions -------------------------
@@ -504,10 +504,10 @@ void LCD_flow()
   //------------------------------Display user interface------------------
   lcd.setCursor(0,0); lcd.print("FlowPulse1:");
   lcd.setCursor(11,0); lcd.print(flow[0]);
-  lcd.setCursor(14,0); lcd.print("Hz");
+  lcd.setCursor(14,0); lcd.print("L");
   lcd.setCursor(0,1); lcd.print("FlowPulse2:");
   lcd.setCursor(11,1); lcd.print(flow[1]);
-  lcd.setCursor(14,1); lcd.print("Hz");
+  lcd.setCursor(14,1); lcd.print("L");
   if(flow[0]<10)  {lcd.setCursor(12,0); lcd.print(" ");}
   if(flow[1]<10)  {lcd.setCursor(12,1); lcd.print(" ");}
   if(flow[0]<100) {lcd.setCursor(13,0); lcd.print(" ");}
@@ -568,7 +568,7 @@ void LCD_temp()
   return;
 }// end LCD_temp
 //----------------------------
-void changeVal(uint16_t mt1,uint16_t mt2,uint16_t mt3,uint16_t mt4,uint16_t mf1,uint16_t mf2) //Change Value temp and flow to display on the LCD
+void changeVal(uint16_t mt1,uint16_t mt2,uint16_t mt3,uint16_t mt4, float mf1, float mf2) //Change Value temp and flow to display on the LCD
 {
   Temp[0]=mt1;
   Temp[1]=mt2;

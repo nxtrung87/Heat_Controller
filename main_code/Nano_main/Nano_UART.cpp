@@ -104,7 +104,8 @@ void UART_isMasterReady() {
   { 
     char Ctemp = Serial.read();
     if (Ctemp=='T') { //if command is T|T1|T2|T3|T4_F|F1|F2
-		  uint16_t t1,t2,t3,t4,f1,f2;
+		  uint16_t t1,t2,t3,t4;
+      float f1,f2;
 		  String buff1="",buff2="",buff3="",buff4="",rec="";
 		  rec=Serial.readString();
 		  t1=rec.indexOf("T",0); //search for initial signal - t for temperature
@@ -129,8 +130,8 @@ void UART_isMasterReady() {
 			  f2=rec.indexOf("|",f1+1);   //position of flow2
 			  buff1=rec.substring(f1+1,f2); //get the string out
 			  buff2=rec.substring(f2+1);  //get the string out
-			  f1=buff1.toInt(); //flow1
-			  f2=buff2.toInt(); //flow2
+			  f1=buff1.toFloat(); //flow1
+			  f2=buff2.toFloat(); //flow2
 			  changeVal(t1,t2,t3,t4,f1,f2); //change it in the LCD screen
 			  sendSD(t1,t2,t3,t4,f1,f2);//save it to the SD card
 		  } else {// no exist signal "t" and "f" at the same time
@@ -209,9 +210,9 @@ void sTempSendToMaster(uint16_t* Mtemp) { //t|T1|T2|T3|T4
   Serial.println(Smes);
 }//end sTempSendToMaster
 //--------------------------------
-void sFlowSendToMaster(uint16_t* Mflow) { //f|F1|F2
+void sFlowSendToMaster(float* Mflow) { //f|F1|F2
   char Smes[30];
-  sprintf(Smes,"F|%d|%d",*(Mflow),*(Mflow+1));
+  sprintf(Smes,"F|%f|%f",*(Mflow),*(Mflow+1));
   Serial.println(Smes);
 }//end sFlowSendToMaster
 //--------------------------------

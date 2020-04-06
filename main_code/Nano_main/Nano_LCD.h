@@ -28,7 +28,7 @@ void LCD_display();
 /**
 Change Value temp and flow to display on the LCD
 */
-void changeVal(uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t);
+void changeVal(uint16_t,uint16_t,uint16_t,uint16_t, float mf1, float mf2);
 /**
 Change Set Value: PID parameters, temp and flow to display on the LCD
 */
