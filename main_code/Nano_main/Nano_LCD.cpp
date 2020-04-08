@@ -125,7 +125,7 @@ void LCD_display() {
 	  case FLOW_STATE: 	{LCD_flow();break;}
     case SET_TEMP:    {TempEditor(); break;}
     case SET_FLOW:    {FlowEditor(); break;}
-    case SHOW_STATE:    {LCD_showState(); break;}
+    case SHOW_STATE:  {LCD_showState(); break;}
 	  case ERROR: 		  {break;}
 	}//end switch
 }//end LCD_display
@@ -578,7 +578,7 @@ void changeVal(uint16_t mt1,uint16_t mt2,uint16_t mt3,uint16_t mt4, float mf1, f
   flow[1]=mf2;
 }// end changeVal
 //----------------------------
-void changeSetVal(float* vPID,uint16_t* vTemp,uint16_t* vFlow) {
+void changeSetVal(float* vPID,uint16_t* vTemp,float* vFlow) {
   *PID = *vPID;         //Kp
   *(PID+1) = *(vPID+1); //Ki
   *(PID+2) = *(vPID+2); //Kd

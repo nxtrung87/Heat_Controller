@@ -32,20 +32,20 @@ void UART_init()
 //------------------------------------------------------------
 void UART_isMasterReady() {
   bool notReady=true;
-  while (notReady) {
-     if( Serial.available()) {//if something appear in the serial monitor
-        if (Serial.read()=='K') {
-          String buff=Serial.readString();
-          if (buff==AUTHORIZED_KEY) {
-            D_PRINTLN(F("Give me the set values"));
-            Serial.print(F("Updated!"));delay(3000);Serial.print(F("Updated!")); //repeat to make sure the master receive the data
+  // while (notReady) {
+  //    if( Serial.available()) {//if something appear in the serial monitor
+  //       if (Serial.read()=='K') {
+  //         String buff=Serial.readString();
+  //         if (buff==AUTHORIZED_KEY) {
+  //           D_PRINTLN(F("Give me the set values"));
+  //           Serial.print(F("Updated!"));delay(3000);Serial.print(F("Updated!")); //repeat to make sure the master receive the data
             while (notReady) {
               if( Serial.available()) {//if something appear in the serial monitor
                 if (Serial.read()=='S') { //S|Kp|Ki|Kd|F1|F2|T1|T2|T3|T4
                   uint16_t t1,t2,t3,t4;
                   float mpid[3]={0,0,0};
                   uint16_t mtemp[4]={0,0,0,0};
-                  uint16_t mflow[2]={0,0};
+                  float mflow[2]={0,0};
                   String mKp="",mKi="",mKd="",mT1="",mT2="",mT3="",mT4="",mF1="",mF2="",rec="";
                   rec=Serial.readString();
                   Serial.println(rec);
@@ -80,8 +80,8 @@ void UART_isMasterReady() {
                     mtemp[1] = mT2.toInt(); //T2
                     mtemp[2] = mT3.toInt(); //T3
                     mtemp[3] = mT4.toInt(); //T4
-                    mflow[0] = mF1.toInt(); //Flow1
-                    mflow[1] = mF2.toInt(); //Flow2
+                    mflow[0] = mF1.toFloat(); //Flow1
+                    mflow[1] = mF2.toFloat(); //Flow2
                     changeSetVal(mpid,mtemp,mflow);
                     Serial.print(F("Updated!"));delay(3000);Serial.print(F("Updated!")); //repeat to make sure the master receive the data
                     notReady=false;
@@ -92,10 +92,10 @@ void UART_isMasterReady() {
                 }//end if
               }//end if
             }//end while
-          }//end if
-        }//end if
-     }//end if
-  }//end while
+          // }//end if
+  //       }//end if
+  //    }//end if
+  // }//end while
 }//end UART_masterReady
 //------------------------------------------------------------
  void UART_getFromMaster() //command: T|T1|T2|T3|T4_F|F1|F2 or P|Kp|Ki|Kd
