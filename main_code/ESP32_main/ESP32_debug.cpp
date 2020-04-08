@@ -12,11 +12,14 @@
 #define  __ESP32_DEBUG_CPP
 #include "ESP32_debug.h"
 
+
+#define PUBLISH_PERIOD_MS       10000
 // ------ Private constants -----------------------------------
 
 // ------ Private function prototypes -------------------------
 
 // ------ Private variables -----------------------------------
+uint64_t last_pub_time = 0;
 
 // ------ PUBLIC variable definitions -------------------------
 
@@ -38,12 +41,13 @@ void debug_init() {
   
   xSemaphoreTake(baton, portMAX_DELAY); // ( TickType_t ) and portTICK_PERIOD_MS is also available , view: http://esp32.info/docs/esp_idf/html/d1/d19/group__xSemaphoreTake.html 
   xSemaphoreGive(baton);
-  
-  FlowSensor_start();
+
 }//end debug_init
 //------------------------------------------------------------
 void system_debug() {
-
+  uint64_t time_since_last_pub = millis() - last_pub_time;
+  if (time_since_last_pub >= PUBLISH_PERIOD_MS)
+  {
 //  PUBLISH THE TEMPERATURE LIKE THIS
   MQTT_T1_pub(tempSen01_read());
   MQTT_T2_pub(tempSen02_read());
@@ -52,9 +56,10 @@ void system_debug() {
 
 //  PUBLISH THE PUMP PWM FREQ LIKE THIS
   MQTT_Pump1pwm_pub(pump1pwm_read());
-  MQTT_FlowSen_01_pub(FlowSensor_get_flow());
+  MQTT_FlowSen_01_pub(FlowSensor_get_flow_polling());
   // MQTT_Pump2pwm_pub(pump2pwm_read());
-
+  last_pub_time = millis();
+  }
 
 }//end system_debug
 

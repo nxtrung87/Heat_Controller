@@ -35,4 +35,10 @@ void FlowSensor_start();
 /** @brief Pause Flow Sensor measurement
  */
 void FlowSensor_pause();
+
+/** @brief Get the current Flow Sensor value in a polled manner
+ * @return The current Flow Sensor value
+ */
+float FlowSensor_get_flow_polling();
+
 #endif //__ESP32_FLOWSENSOR_H
