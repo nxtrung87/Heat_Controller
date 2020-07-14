@@ -25,10 +25,15 @@
 #define WLAN_PASS     "vandershin1112"
 
 /******** MQTT Client Setup **********/
-#define SERVER        "io.adafruit.com"                   //change it to your server
-#define PORT          1883                                // use 8883 for SSL - change it to your port
-#define USERNAME      "heatcontroller2019"                //change it to your username
-#define PASS          "def9f50546334d019a3c58a4a908d1e7"  //change it to your password 36374516bd4246869ce62deac0924c15
+// #define SERVER        "io.adafruit.com"                   //change it to your server
+// #define PORT          1883                                // use 8883 for SSL - change it to your port
+// #define USERNAME      "heatcontroller2019"                //change it to your username
+// #define PASS          "def9f50546334d019a3c58a4a908d1e7"  //change it to your password 36374516bd4246869ce62deac0924c15
+
+#define SERVER        "mqtt.vlwsystemen.nl"                      //change it to your server
+#define PORT          8883                                // use 8883 for SSL - change it to your port
+#define USERNAME      "clie"                //change it to your username
+#define PASS          "5eecd4c981fc4981a616244561b4a73d"  //change it to your password 36374516bd4246869ce62deac0924c15
 #define CLIENT_ID     "HC01"
 
 #define LWT_TOPIC     "heatcontroller2019/feeds/availability" //change it to your last will topic

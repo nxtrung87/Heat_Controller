@@ -40,7 +40,7 @@
 #define FILTER_LAYER  2 //increase this if you want to reduce the noise, but be careful, it will make the system response slower! 
 #define E_MEA 3     //Measurement Uncertainty - How much do we expect to our measurement vary
 #define E_EST 3     //Estimation Uncertainty - Can be initilized with the same value as e_mea since the kalman filter will adjust its value.
-#define Q     0.007 //Process Variance - usually a small number between 0.001 and 1 - how fast your measurement moves. Recommended 0.01. Should be tunned to your needs.
+#define QUE     (0.007) //Process Variance - usually a small number between 0.001 and 1 - how fast your measurement moves. Recommended 0.01. Should be tunned to your needs.
 // ------ Public function prototypes --------------------------
 /**
 Initialize ADC

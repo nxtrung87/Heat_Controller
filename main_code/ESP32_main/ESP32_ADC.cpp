@@ -32,11 +32,11 @@ Read value of the ADC
 **/
 int ADC_read(int,int,int);
 // ------ Private variables -----------------------------------
-SimpleKalmanFilter filter(E_MEA, E_EST, Q); //For flow sensors, we don't have one so we cannot test it
-SimpleKalmanFilter filter1(E_MEA, E_EST, Q); //For T1
-SimpleKalmanFilter filter2(E_MEA, E_EST, Q); //For T2
-SimpleKalmanFilter filter3(E_MEA, E_EST, Q); //For T3
-SimpleKalmanFilter filter4(E_MEA, E_EST, Q); //For T4
+SimpleKalmanFilter filter(E_MEA, E_EST, QUE); //For flow sensors, we don't have one so we cannot test it
+SimpleKalmanFilter filter1(E_MEA, E_EST, QUE); //For T1
+SimpleKalmanFilter filter2(E_MEA, E_EST, QUE); //For T2
+SimpleKalmanFilter filter3(E_MEA, E_EST, QUE); //For T3
+SimpleKalmanFilter filter4(E_MEA, E_EST, QUE); //For T4
 // ------ PUBLIC variable definitions -------------------------
 
 //--------------------------------------------------------------
