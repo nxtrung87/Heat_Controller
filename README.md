@@ -1,7 +1,7 @@
 HEAT CONTROLLER SYSTEM
 
-This is the embedded code of the Heat Controller System, designed for Pomelo Co.
+This is the embedded code of the Heat Controller System, designed for Pomelo Tech B.v.
 
-Last update: 10/2019
+Last update: 07/2020
 
-(c) Can Tho University - 2019
+(c) Pomelo Tech B.V. - 2020
