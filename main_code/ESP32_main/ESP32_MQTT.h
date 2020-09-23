@@ -11,8 +11,8 @@
 #ifndef __ESP32_MQTT_H
 #define __ESP32_MQTT_H
 #include <WiFi.h> //for esp32
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
+#include "src/Adafruit_MQTT_Mod/Adafruit_MQTT.h"
+#include "src/Adafruit_MQTT_Mod/Adafruit_MQTT_Client.h"
 #include "ESP32_NVS.h"
 #include "ESP32_PID.h"
 #include "ESP32_relay.h"
@@ -46,18 +46,18 @@
 //MQTT_CONN_KEEPALIVE is defined inside the Adafruit_MQTT.h (default 5 minutes) --> need to change to 15 min (900)
 //CLEAN_SESSION is defined as TRUE as always clean the session
 
-#define KP_FEED         "heatcontroller2019/feeds/kp"   //command feed, chang it to yours
-#define KI_FEED         "heatcontroller2019/feeds/ki"   //command feed, chang it to yours
-#define KD_FEED         "heatcontroller2019/feeds/kd"   //command feed, chang it to yours
-#define TEMP1_FEED      "heatcontroller2019/feeds/temp01"   //command feed, chang it to yours
-#define TEMP2_FEED      "heatcontroller2019/feeds/temp02"   //command feed, chang it to yours
-#define TEMP3_FEED      "heatcontroller2019/feeds/temp03"   //command feed, chang it to yours
-#define TEMP4_FEED      "heatcontroller2019/feeds/temp04"   //command feed, chang it to yours
-#define PUMP1PWM_FEED   "heatcontroller2019/feeds/pump01pwm"   //command feed, chang it to yours
-#define PUMP2PWM_FEED   "heatcontroller2019/feeds/pump02pwm"   //command feed, chang it to yours
-#define RELAY01_FEED    "heatcontroller2019/feeds/relay01"   //command feed, chang it to yours
-#define RELAY02_FEED    "heatcontroller2019/feeds/relay02"   //command feed, chang it to yours
-#define RELAY03_FEED    "heatcontroller2019/feeds/relay03"   //command feed, chang it to yours
+#define KP_FEED         "heatcontroller2019/feeds/kp"   //command feed, change it to yours
+#define KI_FEED         "heatcontroller2019/feeds/ki"   //command feed, change it to yours
+#define KD_FEED         "heatcontroller2019/feeds/kd"   //command feed, change it to yours
+#define TEMP1_FEED      "heatcontroller2019/feeds/temp01"   //command feed, change it to yours
+#define TEMP2_FEED      "heatcontroller2019/feeds/temp02"   //command feed, change it to yours
+#define TEMP3_FEED      "heatcontroller2019/feeds/temp03"   //command feed, change it to yours
+#define TEMP4_FEED      "heatcontroller2019/feeds/temp04"   //command feed, change it to yours
+#define PUMP1PWM_FEED   "heatcontroller2019/feeds/pump01pwm"   //command feed, change it to yours
+#define PUMP2PWM_FEED   "heatcontroller2019/feeds/pump02pwm"   //command feed, change it to yours
+#define RELAY01_FEED    "heatcontroller2019/feeds/relay01"   //command feed, change it to yours
+#define RELAY02_FEED    "heatcontroller2019/feeds/relay02"   //command feed, change it to yours
+#define RELAY03_FEED    "heatcontroller2019/feeds/relay03"   //command feed, change it to yours
 #define FLOWSENS_01_FEED   "heatcontroller2019/feeds/flowsen-01"
 
 #define PING_WAIT   55000
@@ -116,6 +116,12 @@ void MQTT_Pump2pwm_pub(float);
 Publish the value of flow sensor 01 to the server
 **/
 void MQTT_FlowSen_01_pub(float flowSenVal);
+
+/**
+Handle the looping function for Web Server
+**/
+void MQTT_loopHandle();
+
 /**
 publish the wanted value to the broker (self-created QOS1)-- make sure the packet made it to the broker
 **/
