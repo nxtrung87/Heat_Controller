@@ -13,7 +13,6 @@
 #define  __ESP32_MQTT_CPP
 #include "ESP32_MQTT.h"
 #include <WiFiClientSecure.h>
-#include <WebServer.h>
 #include "AutoConnect.h"
 
 // ------ Private constants -----------------------------------
@@ -28,9 +27,8 @@ Connect to the MQTT broker
 **/
 bool MQTT_connect();
 // ------ Private variables -----------------------------------
-WebServer server;
-AutoConnect portal(server);
-WiFiClientSecure client; // Create an ESP32/ESP8266 WiFiClientSecure class to connect to the MQTT server.
+AutoConnect portal;
+WiFiClientSecure wifi_client; // Create an ESP32/ESP8266 WiFiClientSecure class to connect to the MQTT server.
 const char* test_root_ca= \
       "-----BEGIN CERTIFICATE-----\n" \
       "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
@@ -57,7 +55,8 @@ char* server_name;
 char* client_id;
 char* mqqt_user;
 char* mqtt_password;
-Adafruit_MQTT_Client mqtt(&client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
+bool subscribed = false;
+Adafruit_MQTT_Client mqtt(&wifi_client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
 //PUBLISH
 //NEEDED TO BE QOS0, SO WE CAN USE OUR QOS1 FUNCTION
 Adafruit_MQTT_Publish availability = Adafruit_MQTT_Publish(&mqtt,LWT_TOPIC,MQTT_QOS_0);
@@ -92,31 +91,42 @@ uint32_t lastmillis;
 //--------------------------------------------------------------
 void MQTT_init() {
   if (Wifi_begin()) {
-    mqtt.will (LWT_TOPIC, LWT_PAYLOAD, MQTT_QOS_1, LWT_RETAIN); //Set up last will
-    mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_kd); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_pump1pwm); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_pump2pwm); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_relay01); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_relay02); // Set up MQTT subscriptions.
-    mqtt.subscribe(&sub_relay03); // Set up MQTT subscriptions.
-    
-    if (MQTT_connect()) {
-      lastmillis = millis();
-      publishNow(availability,"online",RETAIN,"Status Failed!","Status updated!");
-      delay(500);
-      publishNow(pub_kp,NVS_read_Kp(),RETAIN,"Kp Failed!","Kp updated!");
-      delay(500);
-      publishNow(pub_ki,NVS_read_Ki(),RETAIN,"Ki Failed!","Ki updated!");
-      delay(500);
-      publishNow(pub_kd,NVS_read_Kd(),RETAIN,"Kd Failed!","Kd updated!");
-    }//end if
+    MQTT_subscribeInit();
   }//end if
-  
-  //pinMode(LED_BUILTIN,OUTPUT);
-  //digitalWrite(LED_BUILTIN,LOW);
 }//end MQTT_init
+
+void MQTT_subscribeInit()
+{
+  if ((WiFi.status() == WL_CONNECTED) && (false == subscribed))
+  {
+    bool succeeded = true;
+    succeeded &= mqtt.will (LWT_TOPIC, LWT_PAYLOAD, MQTT_QOS_1, LWT_RETAIN); //Set up last will
+    succeeded &=mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_kd); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_pump1pwm); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_pump2pwm); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_relay01); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_relay02); // Set up MQTT subscriptions.
+    succeeded &=mqtt.subscribe(&sub_relay03); // Set up MQTT subscriptions.
+
+    if (true == succeeded)
+    {
+      subscribed = true;
+      if (MQTT_connect()) {
+        lastmillis = millis();
+        publishNow(availability,"online",RETAIN,"Status Failed!","Status updated!");
+        delay(500);
+        publishNow(pub_kp,NVS_read_Kp(),RETAIN,"Kp Failed!","Kp updated!");
+        delay(500);
+        publishNow(pub_ki,NVS_read_Ki(),RETAIN,"Ki Failed!","Ki updated!");
+        delay(500);
+        publishNow(pub_kd,NVS_read_Kd(),RETAIN,"Kd Failed!","Kd updated!");
+      }//end if
+    }
+  }
+}
+
 //------------------------------------------
 void MQTT_maintain() {//keep the MQTT connection
     if (MQTT_connect()) { //LED indicator integrated
@@ -131,102 +141,118 @@ void MQTT_maintain() {//keep the MQTT connection
 }//end MQTT_maintain
 //------------------------------------------
 void MQTT_subscribe() {
-   if (WiFi.status() == WL_CONNECTED) {
-      if (MQTT_connect()) {
-        //SUBCRIBE:
-        // this is our 'wait for incoming subscription packets' busy subloop. Max is 15 subs at a time, change at Adafruit_MQTT.h, #define MAXSUBSCRIPTIONS 15
-        Adafruit_MQTT_Subscribe *subscription;                  
-        while ((subscription = mqtt.readSubscription(5000))) {      //wait for signal
-          if (subscription == &sub_kp) {                         // if something new is detected on this topic
-            String sdata = (char*)sub_kp.lastread;   // Function to analize the string
-            float sfloat = sdata.toFloat();
-            if (sfloat!=NVS_read_Kp()) {
-              PID_Kp_write(sfloat);
-              UART_PIDsendToSlave();
-            }//end if
+    if (MQTT_connect()) {
+      //SUBCRIBE:
+      // this is our 'wait for incoming subscription packets' busy subloop. Max is 15 subs at a time, change at Adafruit_MQTT.h, #define MAXSUBSCRIPTIONS 15
+      Adafruit_MQTT_Subscribe *subscription;                  
+      while ((subscription = mqtt.readSubscription(5000))) {      //wait for signal
+        if (subscription == &sub_kp) {                         // if something new is detected on this topic
+          String sdata = (char*)sub_kp.lastread;   // Function to analize the string
+          float sfloat = sdata.toFloat();
+          if (sfloat!=NVS_read_Kp()) {
+            PID_Kp_write(sfloat);
+            UART_PIDsendToSlave();
+          }//end if
+          break;
+        }//end if
+        if (subscription == &sub_ki)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_ki.lastread;   // Function to analize the string
+          float sfloat = sdata.toFloat();
+          if (sfloat!=NVS_read_Ki()) {
+            PID_Ki_write(sfloat);
+            UART_PIDsendToSlave();
+          }//end if
+          break;
+        }//end if  
+        if (subscription == &sub_kd)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_kd.lastread;   // Function to analize the string
+          float sfloat = sdata.toFloat();
+          if (sfloat!=NVS_read_Kd()) {
+            PID_Kd_write(sfloat);
+            UART_PIDsendToSlave();
+          }//end if
+          break;
+        }//end if  
+        if (subscription == &sub_pump1pwm)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_pump1pwm.lastread;   // Function to analize the string
+          float sfloat = sdata.toFloat()/100;
+          pump1_wifiChange(sfloat);
+          break;
+        }//end if
+        if (subscription == &sub_pump2pwm)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_pump2pwm.lastread;   // Function to analize the string
+          float sfloat = sdata.toFloat()/100;
+          pump1_wifiChange(sfloat);
+          break;
+        }//end if
+        if (subscription == &sub_relay01)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_relay01.lastread;   // Function to analize the string
+          if (sdata=="ON") {
+            relay01(ON);
             break;
-          }//end if
-          if (subscription == &sub_ki)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_ki.lastread;   // Function to analize the string
-            float sfloat = sdata.toFloat();
-            if (sfloat!=NVS_read_Ki()) {
-              PID_Ki_write(sfloat);
-              UART_PIDsendToSlave();
-            }//end if
+          } else if (sdata=="OFF") {
+            relay01(OFF);
             break;
-          }//end if  
-          if (subscription == &sub_kd)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_kd.lastread;   // Function to analize the string
-            float sfloat = sdata.toFloat();
-            if (sfloat!=NVS_read_Kd()) {
-              PID_Kd_write(sfloat);
-              UART_PIDsendToSlave();
-            }//end if
+          }//end if else
+        }//end if
+        if (subscription == &sub_relay02)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_relay02.lastread;   // Function to analize the string
+          if (sdata=="ON") {
+            relay02(ON);
             break;
-          }//end if  
-          if (subscription == &sub_pump1pwm)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_pump1pwm.lastread;   // Function to analize the string
-            float sfloat = sdata.toFloat()/100;
-            pump1_wifiChange(sfloat);
+          } else if (sdata=="OFF") {
+            relay02(OFF);
             break;
-          }//end if
-          if (subscription == &sub_pump2pwm)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_pump2pwm.lastread;   // Function to analize the string
-            float sfloat = sdata.toFloat()/100;
-            pump1_wifiChange(sfloat);
+          }//end if else
+        }//end if
+        if (subscription == &sub_relay03)  {                           // if something new is detected on this topic
+          String sdata = (char*)sub_relay03.lastread;   // Function to analize the string
+          if (sdata=="ON") {
+            relay03(ON);
             break;
-          }//end if
-          if (subscription == &sub_relay01)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_relay01.lastread;   // Function to analize the string
-            if (sdata=="ON") {
-              relay01(ON);
-              break;
-            } else if (sdata=="OFF") {
-              relay01(OFF);
-              break;
-            }//end if else
-          }//end if
-          if (subscription == &sub_relay02)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_relay02.lastread;   // Function to analize the string
-            if (sdata=="ON") {
-              relay02(ON);
-              break;
-            } else if (sdata=="OFF") {
-              relay02(OFF);
-              break;
-            }//end if else
-          }//end if
-          if (subscription == &sub_relay03)  {                           // if something new is detected on this topic
-            String sdata = (char*)sub_relay03.lastread;   // Function to analize the string
-            if (sdata=="ON") {
-              relay03(ON);
-              break;
-            } else if (sdata=="OFF") {
-              relay03(OFF);
-              break;
-            }//end if else
-          }//end if
-        }//end while
-      }//end if
+          } else if (sdata=="OFF") {
+            relay03(OFF);
+            break;
+          }//end if else
+        }//end if
+      }//end while
     }//end if
 }//end MQTT_subscribe
 //------------------------------------------
-void publishNow(Adafruit_MQTT_Publish topicPub,const char* MQTTmessage, bool retained, const char* failed, const char* sucess) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
+void publishNow(Adafruit_MQTT_Publish topicPub,const char* MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish((uint8_t *)MQTTmessage,retained)) {Serial.println(F(failed));delay(PUB_WAIT);if (pub++>(PUB_RETRIES-1)) break;} 
-  if (pub<(PUB_RETRIES)) {Serial.println(F(sucess));}
+  while (!topicPub.publish((uint8_t *)MQTTmessage,retained)) 
+  {
+    Serial.println(F(failed));
+    delay(PUB_WAIT);
+    if (pub++>(PUB_RETRIES-1)) 
+      break;
+  } 
+  if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
 //------------------------------------------
-void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, const char* failed, const char* sucess) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
+void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish(MQTTmessage,retained)) {Serial.println(F(failed));delay(PUB_WAIT);if (pub++>(PUB_RETRIES-1)) break;} 
-  if (pub<(PUB_RETRIES)) {Serial.println(F(sucess));}
+  while (!topicPub.publish(MQTTmessage,retained)) 
+  {
+    Serial.println(F(failed));
+    delay(PUB_WAIT);
+    if (pub++>(PUB_RETRIES-1))
+      break;
+  } 
+  if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
 //------------------------------------------
-void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained, const char* failed, const char* sucess) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
+void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish(MQTTmessage,retained)) {Serial.println(F(failed));delay(PUB_WAIT);if (pub++>(PUB_RETRIES-1)) break;} 
-  if (pub<(PUB_RETRIES)) {Serial.println(F(sucess));}
+  while (!topicPub.publish(MQTTmessage,retained)) 
+  {
+    Serial.println(F(failed));
+    delay(PUB_WAIT);
+    if (pub++>(PUB_RETRIES-1))
+      break;
+  } 
+  if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
 //------------------------------------------
 void MQTT_Kp_pub(float mqttKp) {
@@ -286,33 +312,59 @@ bool Wifi_begin() {
   uint32_t mac_1 = mac&0xFFFFFFFF;
   uint32_t mac_2 = mac >> 32;
   char chipId[13];
+  char vlw[] = "VLW_";
+  char ssid[18];
+
   snprintf(chipId, 13, "%04X%08X", mac_2, mac_1);
   Serial.print("MQTT Client ID is: ");
-  Serial.print(chipId);
+  Serial.println(chipId);
+  
+  strncpy(ssid, vlw, 5);
+  strncat(ssid, chipId, 13);
+
   mqtt.setServer((char *)SERVER, PORT);
-  mqtt.setClientId(chipId);
+  mqtt.setClientId(ssid);
+  wifi_client.setCACert(test_root_ca);
 
   // Connect to WiFi access point.
-  Serial.println(); Serial.println();
-  Serial.print(F("Connecting to "));
-  Serial.print(WLAN_SSID);
+  // Serial.println(); Serial.println();
+  // Serial.print(F("Connecting to "));
+  // Serial.print(WLAN_SSID);
 
-  WiFi.begin(WLAN_SSID, WLAN_PASS);
-  char waitTimes=0;
-  while ((WiFi.status() != WL_CONNECTED)&&(waitTimes++<10)) {
-    delay(500);
-    Serial.print(F("."));
-  }//endif
-  if (waitTimes<10) {
-    Serial.println(F("WiFi connected"));
-    Serial.println(F("IP address: "));Serial.println(WiFi.localIP());
-    Serial.println();
-    client.setCACert(test_root_ca);
+  // WiFi.begin(WLAN_SSID, WLAN_PASS);
+
+  // char waitTimes=0;
+  // while ((WiFi.status() != WL_CONNECTED)&&(waitTimes++<10)) {
+  //   delay(500);
+  //   Serial.print(F("."));
+  // }//endif
+
+  // if (waitTimes<10) {
+  //   Serial.println(F("WiFi connected"));
+  //   Serial.println(F("IP address: "));Serial.println(WiFi.localIP());
+  //   Serial.println();
+  //   client.setCACert(test_root_ca);
+  //   return true;
+  // } else {
+  //   Serial.println(F("Wifi failed!")); Serial.println();
+  //   return false;
+  // }//end if else
+
+  AutoConnectConfig  auto_config(ssid, "12345678");
+  auto_config.boundaryOffset = 256;
+  auto_config.autoReconnect = true;
+  auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET|AC_MENUITEM_HOME;
+  auto_config.autoSave = AC_SAVECREDENTIAL_NEVER;
+
+  portal.config(auto_config);
+  Serial.print("Please connect to: ");
+  Serial.println(ssid);  
+  
+  if (portal.begin()) 
+  {
+    Serial.println("WiFi connected: " + WiFi.localIP().toString());
     return true;
-  } else {
-    Serial.println(F("Wifi failed!")); Serial.println();
-    return false;
-  }//end if else
+  }
   return false;
 }//end wifi begin
 //------------------------------------------

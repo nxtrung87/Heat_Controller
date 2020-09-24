@@ -29,11 +29,11 @@ uint64_t last_pub_time = 0;
 void debug_init() {
   vSemaphoreCreateBinary(baton); //initialize binary semaphore //baton = xSemaphoreCreateBinary(); //this works too but not as good as the current use
 
+  nvs_flash_init();
   UART_init();
   ADC_init();
   PID_init();
   pump1_init();
-  pump2_init();
   relay_init();
   FlowSensor_init();
   UART_masterReady();

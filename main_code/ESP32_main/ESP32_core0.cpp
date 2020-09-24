@@ -13,6 +13,7 @@
 #ifndef __ESP32_CORE0_CPP
 #define __ESP32_CORE0_CPP
 #include "ESP32_core0.h"
+#include "ESP32_stateFlow.h"
 
 // ------ Private constants -----------------------------------
 #define C0_TASK_STACK   15000 // Stack size of Task1_CORE0 (in bytes- NOT words)
@@ -27,6 +28,7 @@ static void Core0Task( void * parameter ); //task run on core0
 TaskHandle_t Core0_handle; //pointer
 // ------ PUBLIC variable definitions -------------------------
 extern SemaphoreHandle_t baton;
+int UPDATE_INTERVAL = 3; //time interval to update data to the server
 //--------------------------------------------------------------
 // FUNCTION DEFINITIONS
 //--------------------------------------------------------------
@@ -43,12 +45,14 @@ void core0_init() {
 
 static void Core0Task( void * parameter ) {//usual task run on core0 
   xSemaphoreTake(baton, portMAX_DELAY); // ( TickType_t ) and portTICK_PERIOD_MS is also available , view: http://esp32.info/docs/esp_idf/html/d1/d19/group__xSemaphoreTake.html 
-  MQTT_init();
+  // MQTT_init();
   xSemaphoreGive(baton);
 //////////////////////////////LOOP////////////////////////////////////////////////////
   while (1) {
-    MQTT_maintain();
-    MQTT_subscribe();
+  UART_getFromSlave();
+  UART_sendToSlave(UPDATE_INTERVAL); //send data to slave every 10 second - you can change the interval as you want
+  mainRoutine();
+  yield(); //yield to give processor time to other tasks
   }//end while loop
 }//end Core0Task
 #endif //__ESP32_CORE0_CPP

@@ -12,7 +12,7 @@
 #define  __ESP32_STATEFLOW_CPP
 #include "ESP32_stateFlow.h"
 #include "ESP32_FlowSensor.h"
-#include "nvs_flash.h"
+#include <nvs.h>
 
 // ------ Private constants -----------------------------------
 #define STARTUP_STATE STATE_INIT
@@ -48,11 +48,11 @@ void System_init() {
   ADC_init();
   PID_init();
   pump1_init();
-  // pump2_init();
   relay_init();
   FlowSensor_init();
   UART_masterReady();
   core0_init(); //must stand above MQTT init
+  MQTT_init();
 
   
   xSemaphoreTake(baton, portMAX_DELAY); // ( TickType_t ) and portTICK_PERIOD_MS is also available , view: http://esp32.info/docs/esp_idf/html/d1/d19/group__xSemaphoreTake.html 

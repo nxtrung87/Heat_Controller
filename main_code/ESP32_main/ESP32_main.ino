@@ -11,9 +11,6 @@
 
 
 
-int UPDATE_INTERVAL = 1; //time interval to update data to the server
-
-
 
 
 #ifdef SYSTEM_DEBUG
@@ -21,6 +18,7 @@ int UPDATE_INTERVAL = 1; //time interval to update data to the server
 #else
 #include "ESP32_debug.h"
 #include "ESP32_stateFlow.h"
+#include "ESP32_MQTT.h"
 #endif
 
 
@@ -37,13 +35,14 @@ void setup() {
 }// end setup
 // ---------------------------------- LOOP -------------------------------------------
 void loop() {
-  UART_getFromSlave();
-  UART_sendToSlave(UPDATE_INTERVAL); //send data to slave every 10 second - you can change the interval as you want
 
   #ifdef SYSTEM_DEBUG
   #else
+    MQTT_loopHandle();
+    MQTT_subscribeInit();
     system_debug();
-    mainRoutine();
+    MQTT_maintain();
+    MQTT_subscribe();
   #endif
   
 }//end loop

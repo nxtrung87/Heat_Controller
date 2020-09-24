@@ -73,20 +73,20 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   return calculatedVal; //return the calculated value
 }//end ADC_read
 //------------------------------------------
-int flowSen01_read() {
+// int flowSen01_read() {
 //  return ADC_read(FLOW_SEN01_PIN,FLOW_MIN,FLOW_MAX);
-}//end flowSen01_read
+// }//end flowSen01_read
 //------------------------------------------
-int flowSen02_read() {
+// int flowSen02_read() {
 //  return ADC_read(FLOW_SEN02_PIN,FLOW_MIN,FLOW_MAX);
-}//end flowSen02_read
+// }//end flowSen02_read
 //------------------------------------------
 int tempSen01_read() {
    int a1 = analogRead(TEMP_SEN01_PIN);
   //------------------------------Kalman filter applied:
   int es_senVal1 = filter1.updateEstimate(a1); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
-    int es_senVal1 = filter1.updateEstimate(es_senVal1);   
+    es_senVal1 = filter1.updateEstimate(es_senVal1);   
   }//end for
   //------------------------------Kalman filter done
   int t1= map(es_senVal1,-1023,1060,TEMP_MAX,TEMP_MIN);

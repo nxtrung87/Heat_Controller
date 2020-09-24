@@ -123,6 +123,11 @@ Handle the looping function for Web Server
 void MQTT_loopHandle();
 
 /**
+Initialize the subscription to MQTT server
+**/
+void MQTT_subscribeInit();
+
+/**
 publish the wanted value to the broker (self-created QOS1)-- make sure the packet made it to the broker
 **/
 void publishNow(Adafruit_MQTT_Publish,const char*,bool,const char*,const char*);

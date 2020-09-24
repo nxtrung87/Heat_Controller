@@ -32,8 +32,8 @@ void UART_init()
 void UART_masterReady() {
   Serial.print('K');
   Serial.print(AUTHORIZED_KEY);
-  bool not_authorized = true;
-  uint32_t lastmillis = millis();
+  // bool not_authorized = true;
+  // uint32_t lastmillis = millis();
 //  while (not_authorized) { //while not authorized yet
 //    if ((millis()-lastmillis)>3000) { //only happend once every 3s
 //        Serial.print('K');
@@ -52,7 +52,7 @@ void UART_masterReady() {
   char Smes[60];
   snprintf(Smes,60,"S|%f|%f|%f|%f|%f|%d|%d|%d|%d",NVS_read_Kp(),NVS_read_Ki(),NVS_read_Kd(),NVS_read_F1(),NVS_read_F2(),NVS_read_T1(),NVS_read_T2(),NVS_read_T3(),NVS_read_T4());
   Serial.println(Smes);
-  lastmillis = millis();
+  // lastmillis = millis();
 //  while (1) {
 //    if ((millis()-lastmillis)>3000) { //only happend once every 3s
 //        Serial.println(Smes); //resend if no confirmation was received
@@ -73,7 +73,7 @@ void UART_masterReady() {
   if ((millis()-uartLastMillis)>timeInterval*1000) {
     uartLastMillis = millis();
     char Smes[60];
-    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%f|%f",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),FlowSensor_get_flow(),(float)flowSen02_read());
+    snprintf(Smes,60,"T|%d|%d|%d|%d_F|%f",tempSen01_read(),tempSen02_read(),tempSen03_read(),tempSen04_read(),FlowSensor_get_flow());
     Serial.println(Smes);
   }//end if
 }// end UART_sendToSlave
