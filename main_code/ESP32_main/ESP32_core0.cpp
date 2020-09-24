@@ -50,9 +50,9 @@ static void Core0Task( void * parameter ) {//usual task run on core0
 //////////////////////////////LOOP////////////////////////////////////////////////////
   while (1) {
   UART_getFromSlave();
-  UART_sendToSlave(UPDATE_INTERVAL); //send data to slave every 10 second - you can change the interval as you want
+  UART_sendToSlave(UPDATE_INTERVAL); //send data to slave every UPDATE_INTERVAL seconds - you can change the interval as you want
   mainRoutine();
-  yield(); //yield to give processor time to other tasks
+  vTaskDelay(10); //delay to slow down task to give time for other tasks
   }//end while loop
 }//end Core0Task
 #endif //__ESP32_CORE0_CPP

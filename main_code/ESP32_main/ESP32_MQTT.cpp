@@ -26,6 +26,12 @@ bool Wifi_begin();
 Connect to the MQTT broker 
 **/
 bool MQTT_connect();
+
+/**
+Callback function when the captive portal starts
+**/
+bool MQTT_portalStartCallback(IPAddress ip);
+
 // ------ Private variables -----------------------------------
 AutoConnect portal;
 WiFiClientSecure wifi_client; // Create an ESP32/ESP8266 WiFiClientSecure class to connect to the MQTT server.
@@ -56,6 +62,9 @@ char* client_id;
 char* mqqt_user;
 char* mqtt_password;
 bool subscribed = false;
+char chipId[13];
+char ssid[18];
+
 Adafruit_MQTT_Client mqtt(&wifi_client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
 //PUBLISH
 //NEEDED TO BE QOS0, SO WE CAN USE OUR QOS1 FUNCTION
@@ -311,9 +320,7 @@ bool Wifi_begin() {
   uint64_t mac = ESP.getEfuseMac();
   uint32_t mac_1 = mac&0xFFFFFFFF;
   uint32_t mac_2 = mac >> 32;
-  char chipId[13];
   char vlw[] = "VLW_";
-  char ssid[18];
 
   snprintf(chipId, 13, "%04X%08X", mac_2, mac_1);
   Serial.print("MQTT Client ID is: ");
@@ -323,7 +330,7 @@ bool Wifi_begin() {
   strncat(ssid, chipId, 13);
 
   mqtt.setServer((char *)SERVER, PORT);
-  mqtt.setClientId(ssid);
+  mqtt.setClientId(chipId);
   wifi_client.setCACert(test_root_ca);
 
   // Connect to WiFi access point.
@@ -353,13 +360,11 @@ bool Wifi_begin() {
   AutoConnectConfig  auto_config(ssid, "12345678");
   auto_config.boundaryOffset = 256;
   auto_config.autoReconnect = true;
-  auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET|AC_MENUITEM_HOME;
-  auto_config.autoSave = AC_SAVECREDENTIAL_NEVER;
+  auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET;
 
   portal.config(auto_config);
-  Serial.print("Please connect to: ");
-  Serial.println(ssid);  
-  
+
+  portal.onDetect(MQTT_portalStartCallback);
   if (portal.begin()) 
   {
     Serial.println("WiFi connected: " + WiFi.localIP().toString());
@@ -397,6 +402,14 @@ bool MQTT_connect() {// Ensure the connection to the MQTT server is alive (this 
 void MQTT_loopHandle()
 {
   portal.handleClient();
+}
+
+bool MQTT_portalStartCallback(IPAddress ip)
+{
+  Serial.print("Please connect to network ");
+  Serial.print(ssid);  
+  Serial.println(" with IP:" + WiFi.localIP().toString());
+  return true;
 }
 //------------------------------------------
 #endif //__ESP32_MQTT_CPP
