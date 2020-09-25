@@ -14,6 +14,7 @@
 #include "ESP32_MQTT.h"
 #include <WiFiClientSecure.h>
 #include "AutoConnect.h"
+#include "ESP32_AutoConnect_Aux.h"
 
 // ------ Private constants -----------------------------------
 
@@ -31,6 +32,8 @@ bool MQTT_connect();
 Callback function when the captive portal starts
 **/
 bool MQTT_portalStartCallback(IPAddress ip);
+
+String setMqttClientIdCallbackHandler(AutoConnectAux& aux, PageArgument& args);
 
 // ------ Private variables -----------------------------------
 AutoConnect portal;
@@ -365,6 +368,8 @@ bool Wifi_begin() {
   portal.config(auto_config);
 
   portal.onDetect(MQTT_portalStartCallback);
+  portal.join(Aux_getReference());
+  portal.on("/mqtt_settings", setMqttClientIdCallbackHandler);
   if (portal.begin()) 
   {
     Serial.println("WiFi connected: " + WiFi.localIP().toString());
@@ -410,6 +415,19 @@ bool MQTT_portalStartCallback(IPAddress ip)
   Serial.print(ssid);  
   Serial.println(" with IP:" + WiFi.localIP().toString());
   return true;
+}
+
+String setMqttClientIdCallbackHandler(AutoConnectAux& aux, PageArgument& args)
+{
+  // Get the AutoConnectInput named "clientId".
+  // The where() function returns an uri string of the AutoConnectAux that triggered this handler.
+  AutoConnectAux* mqtt_settings = portal.aux(portal.where());
+  AutoConnectInput& clientIdInput = mqtt_settings->getElement<AutoConnectInput>("clientId");
+
+  Serial.print("New MQTT client ID is: ");
+  Serial.println(clientIdInput.value);
+
+  return String("");
 }
 //------------------------------------------
 #endif //__ESP32_MQTT_CPP
