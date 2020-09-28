@@ -181,5 +181,23 @@ float NVS_read_F2() {
     }//end if else
     return 0;
 }//end NVS_read_F2
+
+void NVS_write_MqttClientId(const char * client_id)
+{
+  preferences.begin("MQTT", false);
+  preferences.putBool("MQTT_valid", true);
+  preferences.putString("clientID", client_id);
+  preferences.end();
+}
+
+bool NVS_read_MqttClientId(char * client_id, size_t maxLen)
+{
+  preferences.begin("MQTT", true);
+  bool success = preferences.getBool("MQTT_valid", false);
+  if (success)
+    preferences.getString("clientID", client_id, maxLen);
+  preferences.end();
+  return success;
+}
 //------------------------------------------
 #endif //_ESP32_NVS_CPP

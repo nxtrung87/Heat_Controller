@@ -15,8 +15,12 @@
 #include <WiFiClientSecure.h>
 #include "AutoConnect.h"
 #include "ESP32_AutoConnect_Aux.h"
+#include "ESP32_NVS.h"
 
 // ------ Private constants -----------------------------------
+#define MQTT_CLIENT_ID__STRING_MAX_SIZE       24U
+#define WIFI_PREFIX                           "VLW_"
+#define WIFI_PREFIX_LENGTH                    4
 
 // ------ Private function prototypes -------------------------
 /**
@@ -33,7 +37,12 @@ Callback function when the captive portal starts
 **/
 bool MQTT_portalStartCallback(IPAddress ip);
 
-String setMqttClientIdCallbackHandler(AutoConnectAux& aux, PageArgument& args);
+/**
+Initialize the MQTT ID, WiFi SoftAP SSID and certificate
+**/
+void MQTT_IdInit();
+
+String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args);
 
 // ------ Private variables -----------------------------------
 AutoConnect portal;
@@ -60,13 +69,10 @@ const char* test_root_ca= \
       "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n" \
       "-----END CERTIFICATE-----\n";
 
-char* server_name;
-char* client_id;
-char* mqqt_user;
-char* mqtt_password;
 bool subscribed = false;
-char chipId[13];
-char ssid[18];
+char chipId[CHIP_ID_HEX_STRING_LENGTH];
+char mqttClientId[MQTT_CLIENT_ID__STRING_MAX_SIZE];
+char ssid[CHIP_ID_HEX_STRING_LENGTH+WIFI_PREFIX_LENGTH];
 
 Adafruit_MQTT_Client mqtt(&wifi_client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
 //PUBLISH
@@ -320,59 +326,25 @@ void MQTT_relay03_pub(bool Rstate) {
 }//end MQTT_relay01_pub
 //------------------------------------------
 bool Wifi_begin() {
-  uint64_t mac = ESP.getEfuseMac();
-  uint32_t mac_1 = mac&0xFFFFFFFF;
-  uint32_t mac_2 = mac >> 32;
-  char vlw[] = "VLW_";
-
-  snprintf(chipId, 13, "%04X%08X", mac_2, mac_1);
-  Serial.print("MQTT Client ID is: ");
-  Serial.println(chipId);
-  
-  strncpy(ssid, vlw, 5);
-  strncat(ssid, chipId, 13);
-
-  mqtt.setServer((char *)SERVER, PORT);
-  mqtt.setClientId(chipId);
-  wifi_client.setCACert(test_root_ca);
-
-  // Connect to WiFi access point.
-  // Serial.println(); Serial.println();
-  // Serial.print(F("Connecting to "));
-  // Serial.print(WLAN_SSID);
-
-  // WiFi.begin(WLAN_SSID, WLAN_PASS);
-
-  // char waitTimes=0;
-  // while ((WiFi.status() != WL_CONNECTED)&&(waitTimes++<10)) {
-  //   delay(500);
-  //   Serial.print(F("."));
-  // }//endif
-
-  // if (waitTimes<10) {
-  //   Serial.println(F("WiFi connected"));
-  //   Serial.println(F("IP address: "));Serial.println(WiFi.localIP());
-  //   Serial.println();
-  //   client.setCACert(test_root_ca);
-  //   return true;
-  // } else {
-  //   Serial.println(F("Wifi failed!")); Serial.println();
-  //   return false;
-  // }//end if else
+  MQTT_IdInit();
 
   AutoConnectConfig  auto_config(ssid, "12345678");
   auto_config.boundaryOffset = 256;
   auto_config.autoReconnect = true;
   auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET;
+  auto_config.immediateStart = false;
+  auto_config.ticker = true;
+  auto_config.tickerPort = LED_BUILTIN;
+  auto_config.tickerOn = HIGH;
 
   portal.config(auto_config);
-
   portal.onDetect(MQTT_portalStartCallback);
   portal.join(Aux_getReference());
-  portal.on("/mqtt_settings", setMqttClientIdCallbackHandler);
+  portal.on("/mqtt_settings", saveMqttClientCallback, AC_EXIT_AHEAD);
+
   if (portal.begin()) 
   {
-    Serial.println("WiFi connected: " + WiFi.localIP().toString());
+    Serial.println("Connected to " +WiFi.SSID() + "with IP: " + WiFi.localIP().toString());
     return true;
   }
   return false;
@@ -413,21 +385,52 @@ bool MQTT_portalStartCallback(IPAddress ip)
 {
   Serial.print("Please connect to network ");
   Serial.print(ssid);  
-  Serial.println(" with IP:" + WiFi.localIP().toString());
+  Serial.println(" with IP: " + WiFi.softAPIP().toString() + "/_ac");
   return true;
 }
 
-String setMqttClientIdCallbackHandler(AutoConnectAux& aux, PageArgument& args)
+String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args)
 {
-  // Get the AutoConnectInput named "clientId".
-  // The where() function returns an uri string of the AutoConnectAux that triggered this handler.
-  AutoConnectAux* mqtt_settings = portal.aux(portal.where());
-  AutoConnectInput& clientIdInput = mqtt_settings->getElement<AutoConnectInput>("clientId");
+  AutoConnectInput& clientIdInput = aux.getElement<AutoConnectInput>("clientId");
+  String newClientId = clientIdInput.value;
+  if (newClientId.length() > 0)
+  {
+    if (newClientId.length()+1 >= MQTT_CLIENT_ID__STRING_MAX_SIZE)
+      newClientId.toCharArray(mqttClientId, MQTT_CLIENT_ID__STRING_MAX_SIZE);
+    else
+      newClientId.toCharArray(mqttClientId, newClientId.length()+1);
+    Serial.print("New MQTT Client ID is: ");
+    Serial.println(mqttClientId);
+    mqtt.setClientId(mqttClientId);
+    NVS_write_MqttClientId(mqttClientId);
+  }
 
-  Serial.print("New MQTT client ID is: ");
-  Serial.println(clientIdInput.value);
-
+  AutoConnectText& newIdText = aux.getElement<AutoConnectText>("currentId");
+  newIdText.value = String("Current MQTT Client ID is: ") + String(mqttClientId);
   return String("");
+}
+
+void MQTT_IdInit()
+{
+  uint64_t mac = ESP.getEfuseMac();
+  uint32_t mac_1 = mac&0xFFFFFFFF;
+  uint32_t mac_2 = mac >> 32;
+
+  snprintf(chipId, CHIP_ID_HEX_STRING_LENGTH, "%04X%08X", mac_2, mac_1);
+  strncpy(ssid, (char*)WIFI_PREFIX, WIFI_PREFIX_LENGTH+1);
+  strncat(ssid, chipId, CHIP_ID_HEX_STRING_LENGTH);
+
+  if (!NVS_read_MqttClientId(mqttClientId, MQTT_CLIENT_ID__STRING_MAX_SIZE))
+  {
+    strncpy(mqttClientId, chipId, CHIP_ID_HEX_STRING_LENGTH);
+    NVS_write_MqttClientId(mqttClientId);
+  }
+
+  Serial.print("MQTT Client ID is: ");
+  Serial.println(mqttClientId);
+
+  mqtt.setClientId(chipId);
+  wifi_client.setCACert(test_root_ca);
 }
 //------------------------------------------
 #endif //__ESP32_MQTT_CPP
