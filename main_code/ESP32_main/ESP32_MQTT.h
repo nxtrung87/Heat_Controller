@@ -63,6 +63,8 @@
 #define PING_WAIT   55000
 #define PING_TIMES  10
 
+#define CHIP_ID_HEX_STRING_LENGTH       13U      
+
 // ------ Public function prototypes --------------------------
 /**
 Initialize Wifi and MQTT

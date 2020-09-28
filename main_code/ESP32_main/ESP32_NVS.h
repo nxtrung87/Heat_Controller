@@ -65,6 +65,16 @@ float NVS_read_F1();
 Read the set Flow
 **/
 float NVS_read_F2();
+
+/**
+ * Write MQTT Client ID to NVS Memory
+ **/
+void NVS_write_MqttClientId(const char * client_id);
+
+/**
+ * Read MQTT Client ID from NVS Memory
+ **/
+bool NVS_read_MqttClientId(char * client_id, size_t maxLen);
 // ------ Public variable -------------------------------------
 
 #endif //_ESP32_NVS_H
