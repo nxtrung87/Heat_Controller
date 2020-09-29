@@ -1,7 +1,5 @@
-#ifndef __ESP32_FLOWSENSOR_H
-#define __ESP32_FLOWSENSOR_H
-
-#include "driver/timer.h"
+#ifndef _ESP32_FLOWSENSOR_H
+#define _ESP32_FLOWSENSOR_H
 
 #define PCNT_FLOWSENSOR_UNIT        PCNT_UNIT_0
 #define PCNT_H_LIM_VAL              1000
@@ -13,7 +11,7 @@
 
 #define TIMER_DIVIDER               80
 #define TIMER_SCALE                 (TIMER_BASE_CLK / TIMER_DIVIDER / 1000)  // convert counter value to milliseconds
-#define FLOWSENSOR_READ_PERIOD_MS   500
+#define FLOWSENSOR_READ_PERIOD_MS   1000
 #define NR_MS_IN_SEC                1000
 #define NR_SEC_IN_MINUTE            60
 
@@ -41,4 +39,4 @@ void FlowSensor_pause();
  */
 float FlowSensor_get_flow_polling();
 
-#endif //__ESP32_FLOWSENSOR_H
+#endif //_ESP32_FLOWSENSOR_H

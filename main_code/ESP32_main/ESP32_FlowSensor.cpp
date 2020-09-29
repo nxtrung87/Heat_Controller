@@ -1,6 +1,7 @@
 #include "ESP32_FlowSensor.h"
 #include "esp_types.h"
 #include "driver/pcnt.h"
+#include "driver/timer.h"
 #include "Arduino.h"
 
 
@@ -34,7 +35,7 @@ timer_config_t timer_config = {
 int16_t flowsensor_current_count = 0;
 float flowsensor_current_flow = 0;
 uint8_t updated = 0;
-uint64_t last_read_time = 0;
+uint32_t last_read_time = 0;
 
 void IRAM_ATTR FlowSensor_timer_isr(void * param);
 void FlowSensor_calc_flow();
@@ -61,6 +62,8 @@ void FlowSensor_init()
     // timer_enable_intr(TIMER_GROUP_0, TIMER_0);
     // timer_isr_register(TIMER_GROUP_0, TIMER_0, FlowSensor_timer_isr,
     //                 (void *)NULL, ESP_INTR_FLAG_IRAM, NULL);
+    last_read_time = millis();
+    pcnt_counter_resume(PCNT_FLOWSENSOR_UNIT); 
 }
 
 void FlowSensor_start()
@@ -78,10 +81,9 @@ void FlowSensor_pause()
 
 void IRAM_ATTR FlowSensor_timer_isr(void * param)
 {
-    pcnt_counter_pause(PCNT_FLOWSENSOR_UNIT);
     pcnt_get_counter_value(PCNT_FLOWSENSOR_UNIT, &flowsensor_current_count);
     updated = 1;
-    pcnt_counter_resume(PCNT_FLOWSENSOR_UNIT);
+    pcnt_counter_clear(PCNT_FLOWSENSOR_UNIT);
 }
 
 void FlowSensor_calc_flow()
@@ -102,14 +104,13 @@ float FlowSensor_get_flow()
 
 float FlowSensor_get_flow_polling()
 {
-    uint64_t time_since_last_read = millis() - last_read_time;
+    uint32_t time_since_last_read = millis() - last_read_time;
     if (time_since_last_read >= FLOWSENSOR_READ_PERIOD_MS)
     {
-        pcnt_counter_pause(PCNT_FLOWSENSOR_UNIT);
         pcnt_get_counter_value(PCNT_FLOWSENSOR_UNIT, &flowsensor_current_count);
         flowsensor_current_flow = flowsensor_current_count * NR_MS_IN_SEC/time_since_last_read
                                 * NR_SEC_IN_MINUTE / FLOWSENSOR_K_FACTOR;
-        pcnt_counter_resume(PCNT_FLOWSENSOR_UNIT);
+        pcnt_counter_clear(PCNT_FLOWSENSOR_UNIT);
         last_read_time = millis();
     }
     return flowsensor_current_flow;

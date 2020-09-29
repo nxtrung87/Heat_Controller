@@ -83,7 +83,7 @@ void pump2_status() {
     if (p2_dutyCycle>PUMP_WARNING) {S_PRINTLN(F("Pump 2 Warning!"));return;}
     if (p2_dutyCycle==0) {S_PRINTLN(F("pump2 No signal!"));return;}
     if (p2_dutyCycle<PUMP_NORMAL) {S_PRINTLN(F("Pump2 in normal condition!"));return;}
-}//end pump1_status
+}//end pump2_status
 //------------------------------------
 void pump1_maxspeed() {
   pump1_output = VAR_MAXSPEED; //set normal output to pseudo maximum value in case of pump_faster() function is called.
