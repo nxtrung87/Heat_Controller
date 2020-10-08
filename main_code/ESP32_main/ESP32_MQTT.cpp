@@ -327,9 +327,10 @@ void MQTT_relay03_pub(bool Rstate) {
 //------------------------------------------
 bool Wifi_begin() {
   MQTT_IdInit();
+  wifi_client.setCACert(test_root_ca);
 
   AutoConnectConfig  auto_config(ssid, "12345678");
-  auto_config.boundaryOffset = 256;
+  // auto_config.boundaryOffset = 256;
   auto_config.autoReconnect = true;
   auto_config.menuItems = AC_MENUITEM_CONFIGNEW|AC_MENUITEM_OPENSSIDS|AC_MENUITEM_DISCONNECT| AC_MENUITEM_RESET;
   auto_config.immediateStart = false;
@@ -339,8 +340,8 @@ bool Wifi_begin() {
 
   portal.config(auto_config);
   portal.onDetect(MQTT_portalStartCallback);
-  portal.join(Aux_getReference());
-  portal.on("/mqtt_settings", saveMqttClientCallback, AC_EXIT_AHEAD);
+  // portal.join(Aux_getReference());
+  // portal.on("/mqtt_settings", saveMqttClientCallback, AC_EXIT_AHEAD);
 
   if (portal.begin()) 
   {
@@ -413,24 +414,20 @@ String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args)
 void MQTT_IdInit()
 {
   uint64_t mac = ESP.getEfuseMac();
-  uint32_t mac_1 = mac&0xFFFFFFFF;
-  uint32_t mac_2 = mac >> 32;
+  uint32_t mac_1 = (((mac&0xFF) << 24) | ((mac&0xFF00) << 8)
+                  | ((mac&0xFF0000) >> 8) | ((mac&0xFF000000) >> 24)) & 0xFFFFFFFF;
+  uint32_t mac_2 = (((mac&0xFF00000000) >> 24) | ((mac&0xFF0000000000) >> 40)) & 0xFFFF;
 
-  snprintf(chipId, CHIP_ID_HEX_STRING_LENGTH, "%04X%08X", mac_2, mac_1);
+  snprintf(chipId, CHIP_ID_HEX_STRING_LENGTH, "%08X%04X", mac_1, mac_2);
   strncpy(ssid, (char*)WIFI_PREFIX, WIFI_PREFIX_LENGTH+1);
   strncat(ssid, chipId, CHIP_ID_HEX_STRING_LENGTH);
 
-  if (!NVS_read_MqttClientId(mqttClientId, MQTT_CLIENT_ID__STRING_MAX_SIZE))
-  {
-    strncpy(mqttClientId, chipId, CHIP_ID_HEX_STRING_LENGTH);
-    NVS_write_MqttClientId(mqttClientId);
-  }
+  strncpy(mqttClientId, chipId, CHIP_ID_HEX_STRING_LENGTH);
 
   Serial.print("MQTT Client ID is: ");
   Serial.println(mqttClientId);
 
   mqtt.setClientId(chipId);
-  wifi_client.setCACert(test_root_ca);
 }
 //------------------------------------------
 #endif //__ESP32_MQTT_CPP
