@@ -118,6 +118,9 @@ void MQTT_subscribeInit()
   if ((WiFi.status() == WL_CONNECTED) && (false == subscribed))
   {
     bool succeeded = true;
+    char offlineMess[24];
+    strncpy(offlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+    strncat(offlineMess, (char*)" - Offline", CHIP_ID_HEX_STRING_LENGTH);
     succeeded &= mqtt.will (LWT_TOPIC, LWT_PAYLOAD, MQTT_QOS_1, LWT_RETAIN); //Set up last will
     succeeded &=mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
@@ -132,8 +135,11 @@ void MQTT_subscribeInit()
     {
       subscribed = true;
       if (MQTT_connect()) {
+        char onlineMess[24];
+        strncpy(onlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+        strncat(onlineMess, (char*)" - Online", CHIP_ID_HEX_STRING_LENGTH);
         lastmillis = millis();
-        publishNow(availability,"online",RETAIN,"Status Failed!","Status updated!");
+        publishNow(availability, onlineMess, RETAIN,"Status Failed!","Status updated!");
         delay(500);
         publishNow(pub_kp,NVS_read_Kp(),RETAIN,"Kp Failed!","Kp updated!");
         delay(500);
@@ -425,7 +431,7 @@ void MQTT_IdInit()
   strncpy(mqttClientId, chipId, CHIP_ID_HEX_STRING_LENGTH);
 
   Serial.print("MQTT Client ID is: ");
-  Serial.println(mqttClientId);
+  Serial.println(chipId);
 
   mqtt.setClientId(chipId);
 }
