@@ -351,7 +351,7 @@ bool Wifi_begin() {
 
   if (portal.begin()) 
   {
-    Serial.println("Connected to " +WiFi.SSID() + "with IP: " + WiFi.localIP().toString());
+    Serial.println("Connected to " +WiFi.SSID() + " with IP: " + WiFi.localIP().toString());
     return true;
   }
   return false;
@@ -420,10 +420,13 @@ String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args)
 void MQTT_IdInit()
 {
   uint64_t mac = ESP.getEfuseMac();
+
+  /* Reverse the endianness of the MAC address */
   uint32_t mac_1 = (((mac&0xFF) << 24) | ((mac&0xFF00) << 8)
                   | ((mac&0xFF0000) >> 8) | ((mac&0xFF000000) >> 24)) & 0xFFFFFFFF;
   uint32_t mac_2 = (((mac&0xFF00000000) >> 24) | ((mac&0xFF0000000000) >> 40)) & 0xFFFF;
 
+  /* Write MAC address value to Chip ID & WiFi SSID */
   snprintf(chipId, CHIP_ID_HEX_STRING_LENGTH, "%08X%04X", mac_1, mac_2);
   strncpy(ssid, (char*)WIFI_PREFIX, WIFI_PREFIX_LENGTH+1);
   strncat(ssid, chipId, CHIP_ID_HEX_STRING_LENGTH);
