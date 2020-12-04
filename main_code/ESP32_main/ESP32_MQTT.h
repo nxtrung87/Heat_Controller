@@ -38,7 +38,7 @@
 
 #define LWT_TOPIC     "heatcontroller2019/feeds/availability" //change it to your last will topic
 #define LWT_PAYLOAD   "offline"
-#define LWT_RETAIN    1     //The broker will store the last message as the last known good value if this flag is on
+#define LWT_RETAIN    0     //The broker will store the last message as the last known good value if this flag is on
 #define RETAIN        true  //The broker will store the last message as the last known good value
 #define NO_RETAIN     false //The broker will not store the last message as the last known good value
 #define PUB_RETRIES   10
@@ -62,6 +62,7 @@
 
 #define PING_WAIT   55000
 #define PING_TIMES  10
+#define CONFIRM_PRESENT_WAIT            3600000
 
 #define CHIP_ID_HEX_STRING_LENGTH       13U      
 
@@ -133,6 +134,7 @@ void MQTT_subscribeInit();
 publish the wanted value to the broker (self-created QOS1)-- make sure the packet made it to the broker
 **/
 void publishNow(Adafruit_MQTT_Publish,const char*,bool,const char*,const char*);
+void publishStringNow(Adafruit_MQTT_Publish,char*,bool,const char*,const char*);
 void publishNow(Adafruit_MQTT_Publish,int, bool,const char*,const char*);
 void publishNow(Adafruit_MQTT_Publish,float, bool,const char*,const char*);
 // ------ Public variable -------------------------------------

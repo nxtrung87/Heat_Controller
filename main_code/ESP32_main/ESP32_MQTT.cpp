@@ -42,6 +42,11 @@ Initialize the MQTT ID, WiFi SoftAP SSID and certificate
 **/
 void MQTT_IdInit();
 
+/**
+Publish an online message to the server
+**/
+void MQTT_appearOnline();
+
 String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args);
 
 // ------ Private variables -----------------------------------
@@ -101,7 +106,8 @@ Adafruit_MQTT_Subscribe sub_relay01 = Adafruit_MQTT_Subscribe(&mqtt,RELAY01_FEED
 Adafruit_MQTT_Subscribe sub_relay02 = Adafruit_MQTT_Subscribe(&mqtt,RELAY02_FEED,MQTT_QOS_1);
 Adafruit_MQTT_Subscribe sub_relay03 = Adafruit_MQTT_Subscribe(&mqtt,RELAY03_FEED,MQTT_QOS_1);
 
-uint32_t lastmillis;
+uint32_t lastmillis = 0;
+uint32_t lastShownOnline = 0;
 // ------ PUBLIC variable definitions -------------------------
 
 //--------------------------------------------------------------
@@ -121,12 +127,11 @@ void MQTT_subscribeInit()
     char offlineMess[24];
     strncpy(offlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
     strncat(offlineMess, (char*)" - Offline", CHIP_ID_HEX_STRING_LENGTH);
-    succeeded &= mqtt.will (LWT_TOPIC, LWT_PAYLOAD, MQTT_QOS_1, LWT_RETAIN); //Set up last will
+    succeeded &= mqtt.will (LWT_TOPIC, (char*)offlineMess, MQTT_QOS_1, LWT_RETAIN); //Set up last will
+    Serial.println(offlineMess);
     succeeded &=mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_kd); // Set up MQTT subscriptions.
-    succeeded &=mqtt.subscribe(&sub_pump1pwm); // Set up MQTT subscriptions.
-    succeeded &=mqtt.subscribe(&sub_pump2pwm); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_relay01); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_relay02); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_relay03); // Set up MQTT subscriptions.
@@ -135,11 +140,8 @@ void MQTT_subscribeInit()
     {
       subscribed = true;
       if (MQTT_connect()) {
-        char onlineMess[24];
-        strncpy(onlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
-        strncat(onlineMess, (char*)" - Online", CHIP_ID_HEX_STRING_LENGTH);
+        MQTT_appearOnline();
         lastmillis = millis();
-        publishNow(availability, onlineMess, RETAIN,"Status Failed!","Status updated!");
         delay(500);
         publishNow(pub_kp,NVS_read_Kp(),RETAIN,"Kp Failed!","Kp updated!");
         delay(500);
@@ -149,6 +151,16 @@ void MQTT_subscribeInit()
       }//end if
     }
   }
+}
+
+void MQTT_appearOnline()
+{
+  char onlineMess[24];
+  strncpy(onlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncat(onlineMess, (char*)" - Online", CHIP_ID_HEX_STRING_LENGTH);
+  lastShownOnline = millis();
+  publishStringNow(availability, (char*)onlineMess, RETAIN,"Status Failed!","Status updated!");
+  Serial.println(onlineMess);
 }
 
 //------------------------------------------
@@ -161,6 +173,21 @@ void MQTT_maintain() {//keep the MQTT connection
         while (! mqtt.ping()) {if(pingCount++>PING_TIMES) mqtt.disconnect();return;}// if ping PING_TIMES times and failed then disconnect
         lastmillis = millis(); //ping sucess
       }//end if
+      
+      uint32_t now = millis();
+      uint32_t time_difference = 0;
+      if (now >= lastShownOnline)
+      {
+        time_difference = now - lastShownOnline;
+      }
+      else 
+      {
+        time_difference = 0xFFFFFFFF - lastShownOnline + now + 1;
+      }
+      if (time_difference > CONFIRM_PRESENT_WAIT)
+      {
+        MQTT_appearOnline();
+      }
     }//end if
 }//end MQTT_maintain
 //------------------------------------------
@@ -197,18 +224,6 @@ void MQTT_subscribe() {
           }//end if
           break;
         }//end if  
-        if (subscription == &sub_pump1pwm)  {                           // if something new is detected on this topic
-          String sdata = (char*)sub_pump1pwm.lastread;   // Function to analize the string
-          float sfloat = sdata.toFloat()/100;
-          pump1_wifiChange(sfloat);
-          break;
-        }//end if
-        if (subscription == &sub_pump2pwm)  {                           // if something new is detected on this topic
-          String sdata = (char*)sub_pump2pwm.lastread;   // Function to analize the string
-          float sfloat = sdata.toFloat()/100;
-          pump1_wifiChange(sfloat);
-          break;
-        }//end if
         if (subscription == &sub_relay01)  {                           // if something new is detected on this topic
           String sdata = (char*)sub_relay01.lastread;   // Function to analize the string
           if (sdata=="ON") {
@@ -243,9 +258,9 @@ void MQTT_subscribe() {
     }//end if
 }//end MQTT_subscribe
 //------------------------------------------
-void publishNow(Adafruit_MQTT_Publish topicPub,const char* MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
+void publishNow(Adafruit_MQTT_Publish topicPub, const char* MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish((uint8_t *)MQTTmessage,retained)) 
+  while (!topicPub.publish(MQTTmessage)) 
   {
     Serial.println(F(failed));
     delay(PUB_WAIT);
@@ -254,10 +269,23 @@ void publishNow(Adafruit_MQTT_Publish topicPub,const char* MQTTmessage, bool ret
   } 
   if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
+
+void publishStringNow(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
+  char pub=1;
+  while (!topicPub.publish((const char *)MQTTmessage)) 
+  {
+    Serial.println(F(failed));
+    delay(PUB_WAIT);
+    if (pub++>(PUB_RETRIES-1)) 
+      break;
+  } 
+  if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
+}//end publishNow
+
 //------------------------------------------
 void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish(MQTTmessage,retained)) 
+  while (!topicPub.publish(MQTTmessage)) 
   {
     Serial.println(F(failed));
     delay(PUB_WAIT);
@@ -269,7 +297,7 @@ void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, c
 //------------------------------------------
 void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
-  while (!topicPub.publish(MQTTmessage,retained)) 
+  while (!topicPub.publish(MQTTmessage, 2)) 
   {
     Serial.println(F(failed));
     delay(PUB_WAIT);
