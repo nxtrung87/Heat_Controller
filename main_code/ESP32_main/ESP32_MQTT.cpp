@@ -18,7 +18,7 @@
 #include "ESP32_NVS.h"
 
 // ------ Private constants -----------------------------------
-#define MQTT_CLIENT_ID__STRING_MAX_SIZE       24U
+#define MQTT_CLIENT_ID_STRING_MAX_SIZE       24U
 #define WIFI_PREFIX                           "VLW_"
 #define WIFI_PREFIX_LENGTH                    4
 
@@ -46,6 +46,10 @@ void MQTT_IdInit();
 Publish an online message to the server
 **/
 void MQTT_appearOnline();
+
+void publishStringIdPrefix(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, const char* failed, const char* success);
+void publishIntIdPrefix(Adafruit_MQTT_Publish topicPub, int MQTTmessage, const char* failed, const char* success);
+void publishFloatIdPrefix(Adafruit_MQTT_Publish topicPub, float MQTTmessage, const char* failed, const char* success);
 
 String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args);
 
@@ -76,7 +80,7 @@ const char* test_root_ca= \
 
 bool subscribed = false;
 char chipId[CHIP_ID_HEX_STRING_LENGTH];
-char mqttClientId[MQTT_CLIENT_ID__STRING_MAX_SIZE];
+char mqttClientId[MQTT_CLIENT_ID_STRING_MAX_SIZE];
 char ssid[CHIP_ID_HEX_STRING_LENGTH+WIFI_PREFIX_LENGTH];
 
 Adafruit_MQTT_Client mqtt(&wifi_client, SERVER, PORT, CLIENT_ID, USERNAME, PASS); // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.;
@@ -142,12 +146,6 @@ void MQTT_subscribeInit()
       if (MQTT_connect()) {
         MQTT_appearOnline();
         lastmillis = millis();
-        delay(500);
-        publishNow(pub_kp,NVS_read_Kp(),RETAIN,"Kp Failed!","Kp updated!");
-        delay(500);
-        publishNow(pub_ki,NVS_read_Ki(),RETAIN,"Ki Failed!","Ki updated!");
-        delay(500);
-        publishNow(pub_kd,NVS_read_Kd(),RETAIN,"Kd Failed!","Kd updated!");
       }//end if
     }
   }
@@ -282,6 +280,26 @@ void publishStringNow(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, bool re
   if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
 
+void publishStringIdPrefix(Adafruit_MQTT_Publish topicPub, char* MQTTmessage, const char* failed, const char* success)
+{
+  char mess[30];
+  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncat(mess, " - ", 3);
+  strncat(mess, MQTTmessage, 12);
+  publishStringNow(topicPub, mess , RETAIN, failed, success);
+}
+
+void publishIntIdPrefix(Adafruit_MQTT_Publish topicPub, int MQTTmessage, const char* failed, const char* success)
+{
+  char mess[30];
+  char value[11];
+  itoa(MQTTmessage, value, 10);
+  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncat(mess, " - ", 3);
+  strncat(mess, value, 11);
+  publishStringNow(topicPub, mess , RETAIN, failed, success);
+}
+
 //------------------------------------------
 void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
@@ -294,6 +312,7 @@ void publishNow(Adafruit_MQTT_Publish topicPub,int MQTTmessage, bool retained, c
   } 
   if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
+
 //------------------------------------------
 void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained, const char* failed, const char* success) {//--------SELF CREATED QOS1 --make sure the packet made it to the broker
   char pub=1;
@@ -306,57 +325,69 @@ void publishNow(Adafruit_MQTT_Publish topicPub,float MQTTmessage, bool retained,
   } 
   if (pub<(PUB_RETRIES)) {Serial.println(F(success));}
 }//end publishNow
+
+void publishFloatIdPrefix(Adafruit_MQTT_Publish topicPub, float MQTTmessage, const char* failed, const char* success)
+{
+  char mess[30];
+  char value[11];
+  dtostrf(MQTTmessage, 10, 2, value);
+  strncpy(mess, chipId, CHIP_ID_HEX_STRING_LENGTH);
+  strncat(mess, " - ", 3);
+  strncat(mess, value, 11);
+  publishStringNow(topicPub, mess , RETAIN, failed, success);
+}
+
 //------------------------------------------
 void MQTT_Kp_pub(float mqttKp) {
-  publishNow(pub_kp,mqttKp,RETAIN,"Kp Failed!","Kp updated!");
+  publishFloatIdPrefix(pub_kp,mqttKp,"Kp Failed!","Kp updated!");
 }//end MQTT_Kp_pub
 //------------------------------------------
 void MQTT_Ki_pub(float mqttKi) {
-  publishNow(pub_ki,mqttKi,RETAIN,"Ki Failed!","Ki updated!");
+  publishFloatIdPrefix(pub_ki,mqttKi,"Ki Failed!","Ki updated!");
 }//end MQTT_Ki_pub
 //------------------------------------------
 void MQTT_Kd_pub(float mqttKd) {
-  publishNow(pub_kd,mqttKd,RETAIN,"Kd Failed!","Kd updated!");
+  publishFloatIdPrefix(pub_kd,mqttKd,"Kd Failed!","Kd updated!");
 }//end MQTT_Kd_pub
 //------------------------------------------
 void MQTT_T1_pub(int mTemp1) {
-  publishNow(temp01,mTemp1,RETAIN,"Temp01 Failed!","Temp01 updated!");
+  publishIntIdPrefix(temp01,mTemp1,"Temp01 Failed!","Temp01 updated!");
 }//end MQTT_T1_pub
 //------------------------------------------
 void MQTT_T2_pub(int mTemp2) {
-  publishNow(temp02,mTemp2,RETAIN,"Temp02 Failed!","Temp02 updated!");
+  publishIntIdPrefix(temp02,mTemp2,"Temp02 Failed!","Temp02 updated!");
 }//end MQTT_T2_pub
 //------------------------------------------
 void MQTT_T3_pub(int mTemp3) {
-  publishNow(temp03,mTemp3,RETAIN,"Temp03 Failed!","Temp03 updated!");
+  publishIntIdPrefix(temp03,mTemp3,"Temp03 Failed!","Temp03 updated!");
 }//end MQTT_T3_pub
 //------------------------------------------
 void MQTT_T4_pub(int mTemp4) {
-  publishNow(temp04,mTemp4,RETAIN,"Temp04 Failed!","Temp04 updated!");
+  publishIntIdPrefix(temp04,mTemp4,"Temp04 Failed!","Temp04 updated!");
 }//end MQTT_T4_pub
 //------------------------------------------
 void MQTT_Pump1pwm_pub(float pwmVal) {
-  publishNow(pub_pump1pwm,(int)(pwmVal*100),RETAIN,"Pump1 pwm Failed!","Pump1 pwm updated!");
+  publishIntIdPrefix(pub_pump1pwm,(int)(pwmVal*100),"Pump1 pwm Failed!","Pump1 pwm updated!");
 }//end MQTT_Pump1pwm_pub
 //------------------------------------------
 void MQTT_Pump2pwm_pub(float pwmVal) {
-  publishNow(pub_pump2pwm,(int)(pwmVal*100),RETAIN,"Pump2 pwm Failed!","Pump2 pwm updated!");
+  publishIntIdPrefix(pub_pump2pwm,(int)(pwmVal*100),"Pump2 pwm Failed!","Pump2 pwm updated!");
 }//end MQTT_Pump2pwm_pub
 //------------------------------------------
 void MQTT_FlowSen_01_pub(float flowSenVal) {
-  publishNow(pub_flowsen01,flowSenVal,RETAIN,"Flow Sensor 01 Failed!","Flow Sensor 01 updated!");
+  publishFloatIdPrefix(pub_flowsen01,flowSenVal,"Flow Sensor 01 Failed!","Flow Sensor 01 updated!");
 }//end MQTT_FlowSen_01_pub
 //------------------------------------------
 void MQTT_relay01_pub(bool Rstate) {
-  publishNow(pub_relay01,(Rstate==ON)?("ON"):("OFF"),RETAIN,"Relay01 Failed!","Relay01 updated!");
+  publishStringIdPrefix(pub_relay01,(char*)((Rstate==ON)?("ON"):("OFF")),"Relay01 Failed!","Relay01 updated!");
 }//end MQTT_relay01_pub
 //------------------------------------------
 void MQTT_relay02_pub(bool Rstate) {
-  publishNow(pub_relay02,(Rstate==ON)?("ON"):("OFF"),RETAIN,"Relay02 Failed!","Relay02 updated!");
+  publishStringIdPrefix(pub_relay02,(char*)((Rstate==ON)?("ON"):("OFF")),"Relay02 Failed!","Relay02 updated!");
 }//end MQTT_relay01_pub
 //------------------------------------------
 void MQTT_relay03_pub(bool Rstate) {
-  publishNow(pub_relay03,(Rstate==ON)?("ON"):("OFF"),RETAIN,"Relay03 Failed!","Relay03 updated!");
+  publishStringIdPrefix(pub_relay03,(char*)((Rstate==ON)?("ON"):("OFF")),"Relay03 Failed!","Relay03 updated!");
 }//end MQTT_relay01_pub
 //------------------------------------------
 bool Wifi_begin() {
@@ -430,8 +461,8 @@ String saveMqttClientCallback(AutoConnectAux& aux, PageArgument& args)
   String newClientId = clientIdInput.value;
   if (newClientId.length() > 0)
   {
-    if (newClientId.length()+1 >= MQTT_CLIENT_ID__STRING_MAX_SIZE)
-      newClientId.toCharArray(mqttClientId, MQTT_CLIENT_ID__STRING_MAX_SIZE);
+    if (newClientId.length()+1 >= MQTT_CLIENT_ID_STRING_MAX_SIZE)
+      newClientId.toCharArray(mqttClientId, MQTT_CLIENT_ID_STRING_MAX_SIZE);
     else
       newClientId.toCharArray(mqttClientId, newClientId.length()+1);
     Serial.print("New MQTT Client ID is: ");

@@ -38,7 +38,7 @@
 
 #define LWT_TOPIC     "heatcontroller2019/feeds/availability" //change it to your last will topic
 #define LWT_PAYLOAD   "offline"
-#define LWT_RETAIN    0     //The broker will store the last message as the last known good value if this flag is on
+#define LWT_RETAIN    1     //The broker will store the last message as the last known good value if this flag is on
 #define RETAIN        true  //The broker will store the last message as the last known good value
 #define NO_RETAIN     false //The broker will not store the last message as the last known good value
 #define PUB_RETRIES   10
@@ -62,7 +62,7 @@
 
 #define PING_WAIT   55000
 #define PING_TIMES  10
-#define CONFIRM_PRESENT_WAIT            3600000
+#define CONFIRM_PRESENT_WAIT            86400000 // one full day
 
 #define CHIP_ID_HEX_STRING_LENGTH       13U      
 
