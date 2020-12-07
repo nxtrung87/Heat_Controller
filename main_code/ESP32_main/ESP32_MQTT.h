@@ -21,8 +21,9 @@
 //#include "config.h"
 
 // ------ Public constants ------------------------------------
-#define WLAN_SSID     "vandershin"
-#define WLAN_PASS     "vandershin1112"
+#define WLAN_SSID     ""
+#define WLAN_PASS     ""
+#define VERSION       "RC 00.01"
 
 /******** MQTT Client Setup **********/
 // #define SERVER        "io.adafruit.com"                   //change it to your server

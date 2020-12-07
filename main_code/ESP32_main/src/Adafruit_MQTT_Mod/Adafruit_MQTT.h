@@ -24,6 +24,8 @@
 
 #include "Arduino.h"
 
+// #define MQTT_DEBUG    1
+
 #if defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_STM32_FEATHER)
 #define strncpy_P(dest, src, len) strncpy((dest), (src), (len))
 #define strncasecmp_P(f1, f2, len) strncasecmp((f1), (f2), (len))

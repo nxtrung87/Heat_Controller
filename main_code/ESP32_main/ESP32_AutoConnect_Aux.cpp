@@ -1,4 +1,5 @@
 #include "ESP32_AutoConnect_Aux.h"
+#include "string.h"
 
 AutoConnectInput clientIdInput("clientId", "", "MQTT Client ID", "", "");
 AutoConnectSubmit saveButton("save", "Save", "/mqtt_settings");
@@ -10,7 +11,17 @@ AutoConnectAux versionAux("/version", "Software Version", true,
 AutoConnectAux mqttAux("/mqtt_settings", "MQTT Settings", true, 
                     {clientIdInput, saveButton, currentClientIdText});
 
-AutoConnectAux& Aux_getReference()
+AutoConnectAux& Aux_getMqttSettingsReference()
 {
     return mqttAux;
+}
+
+AutoConnectAux& Aux_getVersionReference()
+{
+    return versionAux;
+}
+
+void Aux_updateSoftwareVersionText(String newVersion)
+{
+    softwareVersionText.value = newVersion;
 }

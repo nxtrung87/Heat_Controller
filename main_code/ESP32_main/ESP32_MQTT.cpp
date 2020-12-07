@@ -132,7 +132,6 @@ void MQTT_subscribeInit()
     strncpy(offlineMess, chipId, CHIP_ID_HEX_STRING_LENGTH);
     strncat(offlineMess, (char*)" - Offline", CHIP_ID_HEX_STRING_LENGTH);
     succeeded &= mqtt.will (LWT_TOPIC, (char*)offlineMess, MQTT_QOS_1, LWT_RETAIN); //Set up last will
-    Serial.println(offlineMess);
     succeeded &=mqtt.subscribe(&sub_kp); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_ki); // Set up MQTT subscriptions.
     succeeded &=mqtt.subscribe(&sub_kd); // Set up MQTT subscriptions.
@@ -384,14 +383,15 @@ void MQTT_relay01_pub(bool Rstate) {
 //------------------------------------------
 void MQTT_relay02_pub(bool Rstate) {
   publishStringIdPrefix(pub_relay02,(char*)((Rstate==ON)?("ON"):("OFF")),"Relay02 Failed!","Relay02 updated!");
-}//end MQTT_relay01_pub
+}//end MQTT_relay02_pub
 //------------------------------------------
 void MQTT_relay03_pub(bool Rstate) {
   publishStringIdPrefix(pub_relay03,(char*)((Rstate==ON)?("ON"):("OFF")),"Relay03 Failed!","Relay03 updated!");
-}//end MQTT_relay01_pub
+}//end MQTT_relay03_pub
 //------------------------------------------
 bool Wifi_begin() {
   MQTT_IdInit();
+  Aux_updateSoftwareVersionText(String(VERSION));
   wifi_client.setCACert(test_root_ca);
 
   AutoConnectConfig  auto_config(ssid, "12345678");
@@ -405,8 +405,7 @@ bool Wifi_begin() {
 
   portal.config(auto_config);
   portal.onDetect(MQTT_portalStartCallback);
-  // portal.join(Aux_getReference());
-  // portal.on("/mqtt_settings", saveMqttClientCallback, AC_EXIT_AHEAD);
+  portal.join(Aux_getVersionReference());
 
   if (portal.begin()) 
   {
