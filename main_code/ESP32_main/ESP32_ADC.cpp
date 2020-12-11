@@ -106,7 +106,7 @@ int tempSen02_read() {
   }//end for
   //------------------------------Kalman filter done
   int t2=map(es_senVal2,0,2047,TEMP_MAX,TEMP_MIN);
-  t2 = 0.384*t2 - 150.02;  
+  t2 = t2;  
   return t2;
 }//end tempSen02_read
 //------------------------------------------
@@ -134,8 +134,7 @@ int tempSen04_read() {
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
   int t4=map(es_senVal4,0,2047,TEMP_MAX,TEMP_MIN);
-  t4=t4*1;
-  //t4 = 0.384*t4 - 150.02;  
+  t4 = 0.384*t4 - 150.02;  
   return t4;
 }//end tempSen04_read
 //------------------------------------------
