@@ -46,7 +46,7 @@ void ADC_init()
 {
   analogReadResolution(11); // Default of 12 is not very linear. Recommended to use 10 or 11 depending on needed resolution.
   analogSetWidth(11); //Range 0-2047
-  analogSetPinAttenuation(TEMP_SEN01_PIN, ADC_11db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
+  analogSetPinAttenuation(TEMP_SEN01_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN02_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN03_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
   analogSetPinAttenuation(TEMP_SEN04_PIN, ADC_6db); // Default is 11db which is very noisy. Recommended to use 2.5 or 6.
@@ -81,6 +81,7 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
 //  return ADC_read(FLOW_SEN02_PIN,FLOW_MIN,FLOW_MAX);
 // }//end flowSen02_read
 //------------------------------------------
+// T1: Collector Temperature
 int tempSen01_read() {
    int a1 = analogRead(TEMP_SEN01_PIN);
   //------------------------------Kalman filter applied:
@@ -89,37 +90,42 @@ int tempSen01_read() {
     es_senVal1 = filter1.updateEstimate(es_senVal1);   
   }//end for
   //------------------------------Kalman filter done
-  int t1= map(es_senVal1,-1023,1060,TEMP_MAX,TEMP_MIN);
-  t1 = 4*t1;   
+  int t1= map(es_senVal1,0,2047,TEMP_MAX,TEMP_MIN);
+  t1 = t1;
+  //t1 = 0.384*t1 - 150.02;   
   return t1;
 }//end tempSen01_read
 //------------------------------------------
+//T2: Buffer below temperature
 int tempSen02_read() {
-   int a2 = analogRead(FLOW_SEN02_PIN);
+   int a2 = analogRead(TEMP_SEN02_PIN);
   //------------------------------Kalman filter applied:
   int es_senVal2 = filter2.updateEstimate(a2); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal2 = filter2.updateEstimate(es_senVal2);   
   }//end for
   //------------------------------Kalman filter done
-  int t2=map(es_senVal2,950,2047,FLOW_MIN,FLOW_MAX);
-  t2 = 4*t2;  
+  int t2=map(es_senVal2,0,2047,TEMP_MAX,TEMP_MIN);
+  t2 = 0.384*t2 - 150.02;  
   return t2;
 }//end tempSen02_read
 //------------------------------------------
+//T3: Buffer top temperature
 int tempSen03_read() {
-   int a3 = analogRead(FLOW_SEN01_PIN);
+   int a3 = analogRead(TEMP_SEN03_PIN);
   //------------------------------Kalman filter applied:
   int es_senVal3 = filter3.updateEstimate(a3); // first layer
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal3 = filter3.updateEstimate(es_senVal3);   
   }//end for
   //------------------------------Kalman filter done
-  int t3=map(es_senVal3,935,2047,FLOW_MIN,FLOW_MAX); 
-  t3 = 4*t3; 
+  int t3=map(es_senVal3,0,2047,TEMP_MAX,TEMP_MIN); 
+  t3 = t3;
+  //t3 = 0.384*t3 - 150.02; 
   return t3;
 }//end tempSen03_read
 //------------------------------------------
+//T4: Temperature of the cooled down water from the radiator (warming up the house). 
 int tempSen04_read() {
    int a4 = analogRead(TEMP_SEN04_PIN);
   //------------------------------Kalman filter applied:
@@ -127,7 +133,9 @@ int tempSen04_read() {
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
-  int t4=map(es_senVal4,852,2047,TEMP_MAX,TEMP_MIN);  
+  int t4=map(es_senVal4,0,2047,TEMP_MAX,TEMP_MIN);
+  t4=t4*1;
+  //t4 = 0.384*t4 - 150.02;  
   return t4;
 }//end tempSen04_read
 //------------------------------------------
