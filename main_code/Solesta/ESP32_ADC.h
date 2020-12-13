@@ -25,7 +25,7 @@
 // TEMPERATURE MAPPING
 //--------------------------------------------------------------
 #define TEMP_MIN 0    //put the mininum value of your temperature sensor here
-#define TEMP_MAX 150  //put the maximum value of your temperature sensor here
+#define TEMP_MAX 2047  //put the maximum value of your temperature sensor here 2047
 //--------------------------------------------------------------
 // ADC
 //--------------------------------------------------------------

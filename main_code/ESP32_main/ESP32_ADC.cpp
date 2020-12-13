@@ -91,8 +91,7 @@ int tempSen01_read() {
   }//end for
   //------------------------------Kalman filter done
   int t1= map(es_senVal1,0,2047,TEMP_MAX,TEMP_MIN);
-  t1 = t1;
-  //t1 = 0.384*t1 - 150.02;   
+  t1 = 0.4061298348789867*t1 - 189.7813214707583;   
   return t1;
 }//end tempSen01_read
 //------------------------------------------
@@ -106,7 +105,7 @@ int tempSen02_read() {
   }//end for
   //------------------------------Kalman filter done
   int t2=map(es_senVal2,0,2047,TEMP_MAX,TEMP_MIN);
-  t2 = 0.384*t2 - 150.02;  
+  t2 = t2*0.4061298348789867 - 189.7813214707583;  
   return t2;
 }//end tempSen02_read
 //------------------------------------------
@@ -120,8 +119,7 @@ int tempSen03_read() {
   }//end for
   //------------------------------Kalman filter done
   int t3=map(es_senVal3,0,2047,TEMP_MAX,TEMP_MIN); 
-  t3 = t3;
-  //t3 = 0.384*t3 - 150.02; 
+  t3 = t3*0.4061298348789867 - 189.7813214707583;
   return t3;
 }//end tempSen03_read
 //------------------------------------------
@@ -134,8 +132,7 @@ int tempSen04_read() {
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
   int t4=map(es_senVal4,0,2047,TEMP_MAX,TEMP_MIN);
-  t4=t4*1;
-  //t4 = 0.384*t4 - 150.02;  
+  t4 = t4*0.4061298348789867 - 189.7813214707583;  
   return t4;
 }//end tempSen04_read
 //------------------------------------------
