@@ -75,7 +75,7 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   //------------------------------Kalman filter done
   if (es_senVal<200) //if sensor is off or error
     {return SENSOR_ERROR;} //use 200 for compensating for noises.
-  int calculatedVal = map(es_senVal,852,2047,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
+  int calculatedVal = map(es_senVal,0,4096,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
   return calculatedVal; //return the calculated value
 }//end ADC_read
 //------------------------------------------
