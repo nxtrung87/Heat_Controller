@@ -354,16 +354,16 @@ void mainRoutine() {
       pump1_maxspeed(); //PWM_1=1
       relay01(OFF); //Valve=0
       
-      if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
-      { // after 10s 
-        pump1_OFF(); //PWM_1=0
-        relay01(OFF); //Valve=0
-      }
-      if ((millis()-lastMillis)>15000 && (millis()-lastMillis)<=45000)
-      {
-        pump1_maxspeed(); //PWM_1=1
-        relay01(OFF); //Valve=0
-      }
+//      if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
+//      { // after 10s 
+//        pump1_OFF(); //PWM_1=0
+//        relay01(OFF); //Valve=0
+//      }
+//      if ((millis()-lastMillis)>15000 && (millis()-lastMillis)<=45000)
+//      {
+//        pump1_maxspeed(); //PWM_1=1
+//        relay01(OFF); //Valve=0
+//      }
 
       if ((millis()-lastMillis)>45000)
       {
@@ -386,16 +386,16 @@ void mainRoutine() {
       pump1_maxspeed(); //PWM_1=1
       relay01(ON); //Valve=0
       
-    if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
-    { // after 10s 
-      pump1_OFF(); //PWM_1=0
-      relay01(ON); //Valve=0
-    }
-    if ((millis()-lastMillis)>15000 && (millis()-lastMillis)<=45000)
-    {
-      pump1_maxspeed(); //PWM_1=1
-      relay01(ON); //Valve=0
-      }
+//    if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
+//    { // after 10s 
+//      pump1_OFF(); //PWM_1=0
+//      relay01(ON); //Valve=0
+//    }
+//    if ((millis()-lastMillis)>15000 && (millis()-lastMillis)<=45000)
+//    {
+//      pump1_maxspeed(); //PWM_1=1
+//      relay01(ON); //Valve=0
+//      }
 
     if ((millis()-lastMillis)>45000)
     {
@@ -577,7 +577,7 @@ void mainRoutine() {
       pump1_OFF(); //PWM_1=0
       relay01(OFF); //Valve=0
 
-      if ((millis()-lastMillis)>60000*4)
+      if ((millis()-lastMillis)>60000*8)
       {
         lastMillis = millis();
         CurrentState = STATE_READY_1; //STATE_D
@@ -599,7 +599,7 @@ void mainRoutine() {
       pump1_OFF(); //PWM_1=0
       relay01(ON); //Valve=1
 
-      if ((millis()-lastMillis)>60000*4)
+      if ((millis()-lastMillis)>60000*8)
       {
         lastMillis = millis();
         CurrentState = STATE_READY_2; //STATE_D
