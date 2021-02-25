@@ -75,7 +75,7 @@ int ADC_read(int ADCpin, int lowVal, int maxVal)
   //------------------------------Kalman filter done
   if (es_senVal<200) //if sensor is off or error
     {return SENSOR_ERROR;} //use 200 for compensating for noises.
-  int calculatedVal = map(es_senVal,0,4096,lowVal,maxVal); //map es_senVal from 0-4096 to lowVal-maxVal
+  int calculatedVal = map(es_senVal,0,4096,lowVal,maxVal); //map es_senVal from 0-2047 to lowVal-maxVal
   return calculatedVal; //return the calculated value
 }//end ADC_read
 //------------------------------------------
@@ -97,9 +97,8 @@ int tempSen01_read() {
     es_senVal1 = filter1.updateEstimate(es_senVal1);   
   }//end for
   //------------------------------Kalman filter done
-  int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
-  //t1 = t1;
-  t1=a1;   
+  //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
+  int t1 = es_senVal1;   
   return t1;
 }//end tempSen01_read
 //------------------------------------------
@@ -113,9 +112,8 @@ int tempSen02_read() {
     es_senVal2 = filter2.updateEstimate(es_senVal2);   
   }//end for
   //------------------------------Kalman filter done
-  int t2=map(es_senVal2,0,4096,TEMP_MAX,TEMP_MIN);
-  //t2 = t2;
-  t2=a2;  
+  //int t2=map(es_senVal2,0,4096,TEMP_MAX,TEMP_MIN);
+  int t2 = es_senVal2;  
   return t2;
 }//end tempSen02_read
 //------------------------------------------
@@ -129,8 +127,8 @@ int tempSen03_read() {
     es_senVal3 = filter3.updateEstimate(es_senVal3);   
   }//end for
   //------------------------------Kalman filter done
-  int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
-  t3 = t3;
+  //int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
+  int t3 = es_senVal3;
   return t3;
 }//end tempSen03_read
 //------------------------------------------
@@ -143,8 +141,8 @@ int tempSen04_read() {
   for (int a=1;a<FILTER_LAYER; a++) {        // next layers (if possible)
     es_senVal4 = filter4.updateEstimate(es_senVal4);   
   }//end for
-  int t4=map(es_senVal4,0,4096,TEMP_MAX,TEMP_MIN);
-  t4 = t4;  
+  //int t4=map(es_senVal4,0,4096,TEMP_MAX,TEMP_MIN);
+  int t4 = es_senVal4;  
   return t4;
 }//end tempSen04_read
 //------------------------------------------

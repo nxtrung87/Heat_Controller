@@ -77,7 +77,8 @@ void mainRoutine() {
       S_PRINTLN(Smes);
 
       }
-    pump1_OFF(); //PWM_1=0
+    //pump1_OFF(); //PWM_1=0
+    Pump_output(0);
     relay01(OFF); //Valve=0
     //lastMillis = millis();
 
@@ -86,7 +87,7 @@ void mainRoutine() {
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
       
-      if (tempSen03_read() < tempSen04_read())
+      if (tempSen02_read() < tempSen04_read())
       {
         if ((millis()-lastMillis)>10000)
         {
@@ -103,7 +104,7 @@ void mainRoutine() {
     { // T_collector >60
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       {
         if((millis()-lastMillis)>1000*30)
         {
@@ -113,7 +114,7 @@ void mainRoutine() {
           break;
         }       
       }
-      if (tempSen03_read() < tempSen04_read())
+      if (tempSen02_read() < tempSen04_read())
       {
        if((millis()-lastMillis)>1000*30)
         {
@@ -140,7 +141,8 @@ void mainRoutine() {
       S_PRINTLN(Smes);
 
     }
-    pump1_OFF(); //PWM_1=0
+    Pump_output(0);
+    //pump1_OFF(); //PWM_1=0
     relay01(ON); //Valve=0
       
     if (tempSen01_read()<60)
@@ -148,7 +150,7 @@ void mainRoutine() {
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
       
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       {
         if ((millis()-lastMillis)>10000)
         {
@@ -167,7 +169,7 @@ void mainRoutine() {
       { // T_collector >60
         //Serial.println(millis()); //prints time since program started
         //Serial.println(lastMillis); //prints time since program started
-        if (tempSen03_read() >= tempSen04_read())
+        if (tempSen02_read() >= tempSen04_read())
         {
           if((millis()-lastMillis)>10000)
           {
@@ -177,7 +179,7 @@ void mainRoutine() {
             break;
           }       
         }
-        if (tempSen03_read() < tempSen04_read())
+        if (tempSen02_read() < tempSen04_read())
         {
          if((millis()-lastMillis)>10000)
           {
@@ -204,19 +206,19 @@ void mainRoutine() {
       snprintf(Smes,50,"Z|%d| Ready 01 State",CurrentState);
       S_PRINTLN(Smes);
     }
-    
-      pump1_OFF(); //PWM_1=0
+      Pump_output(0);
+      //pump1_OFF(); //PWM_1=0
       relay01(OFF); //Valve=0
 
     if (tempSen01_read()<50) 
     { // T_collector <50
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       {
         CurrentState = STATE_INIT_1; // STATE_A
         stateChanged = true;
         break;
       }
-      else if (tempSen03_read() < tempSen04_read())
+      else if (tempSen02_read() < tempSen04_read())
       {
         CurrentState = STATE_INIT_2; // STATE_A
         stateChanged = true;
@@ -224,10 +226,10 @@ void mainRoutine() {
       }   
     }//end if    
        
-    if ((tempSen03_read()<85) && tempSen01_read()>=50)
+    if ((tempSen02_read()<85) && tempSen01_read()>=50)
     { //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started 
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -237,7 +239,7 @@ void mainRoutine() {
           break;
         }         
       }
-      else if (tempSen03_read() < tempSen04_read())
+      else if (tempSen02_read() < tempSen04_read())
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -251,9 +253,9 @@ void mainRoutine() {
       //else {lastMillis = millis();}
     } 
 
-    if ((tempSen03_read()>=85)&& tempSen01_read()>=50)
+    if ((tempSen02_read()>=85)&& tempSen01_read()>=50)
     { 
-      if (tempSen03_read() < tempSen04_read())
+      if (tempSen02_read() < tempSen04_read())
       { //after 5secs
         if((millis()-lastMillis)>10000)
         {
@@ -279,18 +281,19 @@ void mainRoutine() {
       S_PRINTLN(Smes);
     }
     
-      pump1_OFF(); //PWM_1=0
+      Pump_output(0);
+      //pump1_OFF(); //PWM_1=0
       relay01(ON); //Valve=0
 
      if (tempSen01_read()<50) 
     { // T_collector <50
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       {
         CurrentState = STATE_INIT_1; // STATE_A
         stateChanged = true;
         break;
       }
-      else if (tempSen03_read() < tempSen04_read())
+      else if (tempSen02_read() < tempSen04_read())
       {
         CurrentState = STATE_INIT_2; // STATE_A
         stateChanged = true;
@@ -298,10 +301,10 @@ void mainRoutine() {
       }   
     }//end if    
   
-    if ((tempSen03_read()<85) && tempSen01_read()>=50)
+    if ((tempSen02_read()<85) && tempSen01_read()>=50)
     { //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started 
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       { //after 5secs
         if ((millis()-lastMillis)>10000) //back to 10000
         {
@@ -311,7 +314,7 @@ void mainRoutine() {
           break;
         }         
       }
-      else if (tempSen03_read() < tempSen04_read())
+      else if (tempSen02_read() < tempSen04_read())
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -325,9 +328,9 @@ void mainRoutine() {
       //else {lastMillis = millis();}
     } 
 
-    if ((tempSen03_read()>=85)&& tempSen01_read()>=50)
+    if ((tempSen02_read()>=85)&& tempSen01_read()>=50)
     { 
-      if (tempSen03_read() >= tempSen04_read())
+      if (tempSen02_read() >= tempSen04_read())
       { //after 5secs
         if((millis()-lastMillis)>10000)
         {
@@ -351,7 +354,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Startup State 1",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump1_maxspeed(); //PWM_1=1
+      Pump_output(1);
+      //pump1_maxspeed(); //PWM_1=1
       relay01(OFF); //Valve=0
       
 //      if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
@@ -383,7 +387,8 @@ void mainRoutine() {
       snprintf(Smes,50,"Z|%d| Startup State 2",CurrentState);
       S_PRINTLN(Smes);
     }
-      pump1_maxspeed(); //PWM_1=1
+      Pump_output(1);
+      //pump1_maxspeed(); //PWM_1=1
       relay01(ON); //Valve=0
       
 //    if ((millis()-lastMillis)>10000 && (millis()-lastMillis)<=15000) 
@@ -424,12 +429,12 @@ void mainRoutine() {
     Pump_output(temp);
     
     //---------------------//----------------------
-    if(tempSen01_read()>50 && tempSen03_read()<=85 && tempSen03_read() >= tempSen04_read())
+    if(tempSen01_read()>50 && tempSen02_read()<=85 && tempSen02_read() >= tempSen04_read())
     {
       lastMillis = millis();
     }
       
-    else if(tempSen01_read()>50 && tempSen03_read()<=85 && tempSen03_read() < tempSen04_read())
+    else if(tempSen01_read()>50 && tempSen02_read()<=85 && tempSen02_read() < tempSen04_read())
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -440,7 +445,7 @@ void mainRoutine() {
         }      
       //else {lastMillis = millis();}
     }      
-    else if ((tempSen03_read()>85)&& tempSen03_read() >= tempSen04_read())
+    else if ((tempSen02_read()>85)&& tempSen02_read() >= tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -450,7 +455,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen03_read()>85)&& tempSen03_read() < tempSen04_read())
+    else if ((tempSen02_read()>85)&& tempSen02_read() < tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -460,7 +465,7 @@ void mainRoutine() {
         break;
       }//end if
     }          
-    else if ((tempSen01_read()<=50)&& tempSen03_read() >= tempSen04_read()) 
+    else if ((tempSen01_read()<=50)&& tempSen02_read() >= tempSen04_read()) 
     { // T_collector <50
       if ((millis()-lastMillis)>10000)
       {
@@ -471,7 +476,7 @@ void mainRoutine() {
       }
     }
 
-    else if ((tempSen01_read()<=50)&& tempSen03_read() < tempSen04_read()) 
+    else if ((tempSen01_read()<=50)&& tempSen02_read() < tempSen04_read()) 
     { // T_collector <50
       if ((millis()-lastMillis)>10000)
       {
@@ -504,12 +509,12 @@ void mainRoutine() {
       //-------------------------------------------------
     
       Pump_output(temp);
-    if(tempSen01_read()>50 && tempSen03_read()<=85 && tempSen03_read() < tempSen04_read())
+    if(tempSen01_read()>50 && tempSen02_read()<=85 && tempSen02_read() < tempSen04_read())
     {
       lastMillis = millis();
     }
       
-    else if(tempSen01_read()>50 && tempSen03_read()<=85 && tempSen03_read() >= tempSen04_read())
+    else if(tempSen01_read()>50 && tempSen02_read()<=85 && tempSen02_read() >= tempSen04_read())
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -520,7 +525,7 @@ void mainRoutine() {
         }      
       //else {lastMillis = millis();}
     }      
-    else if ((tempSen03_read()>85)&& tempSen03_read() >= tempSen04_read())
+    else if ((tempSen02_read()>85)&& tempSen02_read() >= tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -530,7 +535,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen03_read()>85)&& tempSen03_read() < tempSen04_read())
+    else if ((tempSen02_read()>85)&& tempSen02_read() < tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -540,7 +545,7 @@ void mainRoutine() {
         break;
       }//end if
     }          
-    else if ((tempSen01_read()<=50)&& tempSen03_read() >= tempSen04_read()) 
+    else if ((tempSen01_read()<=50)&& tempSen02_read() >= tempSen04_read()) 
     { // T_collector <50
       if ((millis()-lastMillis)>10000)
       {
@@ -551,7 +556,7 @@ void mainRoutine() {
       }
     }
 
-    else if ((tempSen01_read()<=50)&& tempSen03_read() < tempSen04_read()) 
+    else if ((tempSen01_read()<=50)&& tempSen02_read() < tempSen04_read()) 
     { // T_collector <50
       if ((millis()-lastMillis)>10000)
       {
@@ -574,7 +579,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Pause State 1",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump1_OFF(); //PWM_1=0
+      Pump_output(0);
+      //pump1_OFF(); //PWM_1=0
       relay01(OFF); //Valve=0
 
       if ((millis()-lastMillis)>60000*8)
@@ -596,7 +602,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Pause State 2",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump1_OFF(); //PWM_1=0
+      Pump_output(0);
+      //pump1_OFF(); //PWM_1=0
       relay01(ON); //Valve=1
 
       if ((millis()-lastMillis)>60000*8)

@@ -69,7 +69,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Initial State",CurrentState);
         S_PRINTLN(Smes);
       }
-    pump1_OFF(); //PWM_1=0
+    //pump1_OFF(); //PWM_1=0
+    Pump_output(0);
     relay01(OFF); //Valve=0
     //lastMillis = millis();
     
@@ -99,7 +100,8 @@ void mainRoutine() {
         S_PRINTLN(Smes);
       }
     
-      pump1_OFF(); //PWM_1=0
+      //pump1_OFF(); //PWM_1=0
+      Pump_output(0);
       relay01(OFF); //Valve=0
 
       if (tempSen01_read()<50) 
@@ -135,7 +137,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Startup State",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump1_maxspeed(); //PWM_1=1
+      //pump1_maxspeed(); //PWM_1=1
+      Pump_output(1);
       relay01(OFF); //Valve=0
         
       if ((millis()-lastMillis)>30000)
@@ -193,7 +196,8 @@ void mainRoutine() {
         snprintf(Smes,50,"Z|%d| Pause State",CurrentState);
         S_PRINTLN(Smes);
       }
-      pump1_OFF(); //PWM_1=0
+      //pump1_OFF(); //PWM_1=0
+      Pump_output(0);
       relay01(OFF); //Valve=0
 
       if ((millis()-lastMillis)>60000*4)

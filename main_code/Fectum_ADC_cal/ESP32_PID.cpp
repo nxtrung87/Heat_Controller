@@ -117,6 +117,8 @@ float PIDcal(int setVal,int realVal) {
   //We calculate the error between the setpoint and the real value
   float PID_error = setVal - realVal;
   //Calculate the P value
+  if(PID_error < 1){PID_error = 1;}
+  
   PID_p = kp / PID_error;
   //Calculate the I value in a range on +-3
   //if(-3 < PID_error <3) {PID_i = PID_i + (ki * PID_error);}
