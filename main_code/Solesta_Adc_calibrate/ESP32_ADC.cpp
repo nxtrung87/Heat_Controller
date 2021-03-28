@@ -98,7 +98,8 @@ int tempSen01_read() {
   }//end for
   //------------------------------Kalman filter done
   //int t1= map(es_senVal1,0,4096,TEMP_MAX,TEMP_MIN);
-  int t1 = 0.1*es_senVal1;   
+  int t1 = es_senVal1;
+  //t1 = a*t1 + b;   
   return t1;
 }//end tempSen01_read
 //------------------------------------------
@@ -129,6 +130,7 @@ int tempSen03_read() {
   //------------------------------Kalman filter done
   //int t3=map(es_senVal3,0,4096,TEMP_MAX,TEMP_MIN); 
   int t3 = es_senVal3;
+  //t3 = a*t3 + b; 
   return t3;
 }//end tempSen03_read
 //------------------------------------------
