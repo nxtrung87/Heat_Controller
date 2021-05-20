@@ -448,12 +448,12 @@ void mainRoutine() {
     Pump_output(temp);
     
     //---------------------//----------------------
-    if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && tempSen02_read() <= tempSen01_read() && tempSen03_read() <= tempSen01_read() && tempSen02_read() >= tempSen04_read())
+    if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen02_read() >= tempSen04_read())
     {
       lastMillis = millis();
     }
- 
-    else if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && tempSen02_read() <= tempSen01_read() && tempSen03_read() <= tempSen01_read() &&  tempSen02_read() < tempSen04_read())
+   
+    else if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() &&  tempSen02_read() < tempSen04_read())
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -464,8 +464,8 @@ void mainRoutine() {
         }      
       //else {lastMillis = millis();}
     }
-      
-    else if ((tempSen02_read()>80 || tempSen02_read() > tempSen01_read() || tempSen01_read()<=50 || tempSen03_read() > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() >= tempSen04_read())
+       //(tempSen02_read() + 5)
+    else if ((tempSen02_read()>80 || (tempSen02_read() + 5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read() +5) > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() >= tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -475,7 +475,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen02_read()>80 || tempSen02_read() > tempSen01_read() || tempSen01_read()<=50 || tempSen03_read() > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() < tempSen04_read())
+    else if ((tempSen02_read()>80 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() < tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -508,12 +508,12 @@ void mainRoutine() {
       //-------------------------------------------------
     
       Pump_output(temp);
-    if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && tempSen02_read() <= tempSen01_read() && tempSen03_read() <= tempSen01_read() && tempSen02_read() < tempSen04_read())
+    if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen02_read() < tempSen04_read())
     {
       lastMillis = millis();
     }
       
-    else if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && tempSen02_read() <= tempSen01_read() && tempSen03_read() <= tempSen01_read() && tempSen02_read() >= (tempSen04_read()+5))
+    else if(tempSen01_read()>50 && tempSen02_read()<=80  && tempSen03_read()<=80 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen02_read() >= (tempSen04_read()+5))
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -525,7 +525,7 @@ void mainRoutine() {
       //else {lastMillis = millis();}
     }
       
-    else if ((tempSen02_read()>80 || tempSen02_read() > tempSen01_read() || tempSen01_read()<=50 || tempSen03_read() > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() >= tempSen04_read())
+    else if ((tempSen02_read()>80 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() >= tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -535,7 +535,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen02_read()>80 || tempSen02_read() > tempSen01_read() || tempSen01_read()<=50 || tempSen03_read() > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() < tempSen04_read())
+    else if ((tempSen02_read()>80 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>80) && tempSen02_read() < tempSen04_read())
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -707,12 +707,12 @@ void mainRoutine() {
       Pump_output(temp);
     
       //---------------------//----------------------
-      if(tempSen01_read()>50 && tempSen02_read()<=80 && tempSen02_read() <= tempSen01_read() && tempSen03_read()<=80  && tempSen03_read() <= tempSen01_read() )
+      if(tempSen01_read()>50 && tempSen02_read()<=80 && (tempSen02_read() + 5) <= tempSen01_read() && tempSen03_read()<=80  && (tempSen03_read()+5) <= tempSen01_read() )
       {
         lastMillis = millis();
       }
-      
-      else if (tempSen02_read()>80 || tempSen02_read() > tempSen01_read() || tempSen01_read()<=50 || tempSen03_read() > tempSen01_read() || tempSen03_read()>80)
+      //tempSen02_read() + 5
+      else if (tempSen02_read()>80 || (tempSen02_read() + 5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read() +5) > tempSen01_read() || tempSen03_read()>80)
       { 
         if ((millis()-lastMillis)>10000)
         { //after 5secs
