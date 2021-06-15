@@ -100,7 +100,7 @@ void mainRoutine() {
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
       
-      if (tempSen04_read()() < 20)
+      if (tempSen04_read() < 27)
       {
         if ((millis()-lastMillis)>10000)
         {
@@ -117,7 +117,7 @@ void mainRoutine() {
     { // T_collector >60
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       {
         if((millis()-lastMillis)>1000*30)
         {
@@ -127,7 +127,7 @@ void mainRoutine() {
           break;
         }       
       }
-      if (tempSen04_read() < 20)
+      if (tempSen04_read() < 27)
       {
        if((millis()-lastMillis)>1000*30)
         {
@@ -163,7 +163,7 @@ void mainRoutine() {
       //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started
       
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       {
         if ((millis()-lastMillis)>10000)
         {
@@ -182,7 +182,7 @@ void mainRoutine() {
       { // T_collector >60
         //Serial.println(millis()); //prints time since program started
         //Serial.println(lastMillis); //prints time since program started
-        if (tempSen04_read() >= 20)
+        if (tempSen04_read() >= 27)
         {
           if((millis()-lastMillis)>10000)
           {
@@ -192,7 +192,7 @@ void mainRoutine() {
             break;
           }       
         }
-        if (tempSen04_read() < 20)
+        if (tempSen04_read() < 27)
         {
          if((millis()-lastMillis)>10000)
           {
@@ -225,13 +225,13 @@ void mainRoutine() {
 
     if (tempSen01_read()<50) 
     { // T_collector <50
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       {
         CurrentState = STATE_INIT_1; // STATE_A
         stateChanged = true;
         break;
       }
-      else if (tempSen04_read() < 20)
+      else if (tempSen04_read() < 27)
       {
         CurrentState = STATE_INIT_2; // STATE_A
         stateChanged = true;
@@ -244,7 +244,7 @@ void mainRoutine() {
     if (tempSen02_read()<80 && tempSen03_read()<80 && (tempSen02_read() + 5) < tempSen01_read() && (tempSen03_read()+5) < tempSen01_read() && tempSen01_read()>=50)
     { //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started 
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -254,7 +254,7 @@ void mainRoutine() {
           break;
         }         
       }
-      else if (tempSen04_read() < 20)
+      else if (tempSen04_read() < 27)
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -271,7 +271,7 @@ void mainRoutine() {
 
     if ((tempSen02_read()>=80 || tempSen03_read()>=80 || (tempSen02_read() + 5) >= tempSen01_read() || (tempSen03_read()+5) >= tempSen01_read())&& tempSen01_read()>=50)
     { 
-      if (tempSen04_read() < 20)
+      if (tempSen04_read() < 27)
       { //after 5secs
         if((millis()-lastMillis)>10000)
         {
@@ -303,13 +303,13 @@ void mainRoutine() {
 
      if (tempSen01_read()<50) 
     { // T_collector <50
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       {
         CurrentState = STATE_INIT_1; // STATE_A
         stateChanged = true;
         break;
       }
-      else if (tempSen04_read() < 20)
+      else if (tempSen04_read() < 27)
       {
         CurrentState = STATE_INIT_2; // STATE_A
         stateChanged = true;
@@ -322,7 +322,7 @@ void mainRoutine() {
     if (tempSen02_read()<80 && tempSen03_read()<80 && (tempSen02_read() + 5) < tempSen01_read() && (tempSen03_read()+5) < tempSen01_read() && tempSen01_read()>=50)
     { //Serial.println(millis()); //prints time since program started
       //Serial.println(lastMillis); //prints time since program started 
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       { //after 5secs
         if ((millis()-lastMillis)>10000) //back to 10000
         {
@@ -332,7 +332,7 @@ void mainRoutine() {
           break;
         }         
       }
-      else if (tempSen04_read() < 20)
+      else if (tempSen04_read() < 27)
       { //after 5secs
         if ((millis()-lastMillis)>10000)  //back to 10000
         {
@@ -349,7 +349,7 @@ void mainRoutine() {
 
     if ((tempSen02_read()>=80 || tempSen03_read()>=80 || (tempSen02_read() + 5) >= tempSen01_read() || (tempSen03_read()+5) >= tempSen01_read())&& tempSen01_read()>=50)
     { 
-      if (tempSen04_read() >= 20)
+      if (tempSen04_read() >= 27)
       { //after 5secs
         if((millis()-lastMillis)>10000)
         {
@@ -448,12 +448,12 @@ void mainRoutine() {
     Pump_output(temp);
     
     //---------------------//----------------------
-    if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() >= 20)
+    if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() >= 27)
     {
       lastMillis = millis();
     }
    
-    else if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() &&  tempSen04_read() < 20)
+    else if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() &&  tempSen04_read() < 27)
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -465,7 +465,7 @@ void mainRoutine() {
       //else {lastMillis = millis();}
     }
        //(tempSen02_read() + 5)
-    else if ((tempSen02_read()>85 || (tempSen02_read() + 5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read() +5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() >= 20)
+    else if ((tempSen02_read()>85 || (tempSen02_read() + 5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read() +5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() >= 27)
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -475,7 +475,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() < 20)
+    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() < 27)
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -508,12 +508,12 @@ void mainRoutine() {
       //-------------------------------------------------
     
       Pump_output(temp);
-    if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() < 20)
+    if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() < 27)
     {
       lastMillis = millis();
     }
       
-    else if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() >= 20)
+    else if(tempSen01_read()>50 && tempSen02_read()<=85  && tempSen03_read()<=85 && (tempSen02_read()+5) <= tempSen01_read() && (tempSen03_read()+5) <= tempSen01_read() && tempSen04_read() >= 27)
     {
         if ((millis()-lastMillis)>10000)
         { //after 10 secs
@@ -525,7 +525,7 @@ void mainRoutine() {
       //else {lastMillis = millis();}
     }
       
-    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() >= 20)
+    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() >= 27)
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
@@ -535,7 +535,7 @@ void mainRoutine() {
         break;
       }//end if
     }
-    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() < 20)
+    else if ((tempSen02_read()>85 || (tempSen02_read()+5) > tempSen01_read() || tempSen01_read()<=50 || (tempSen03_read()+5) > tempSen01_read() || tempSen03_read()>85) && tempSen04_read() < 27)
     { 
       if ((millis()-lastMillis)>10000)
       { //after 5secs
